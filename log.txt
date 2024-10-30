@@ -1,0 +1,18 @@
+Array
+(
+    [username] => Organizer001
+    [password] => $2y$10$w92FBhuVTGQ0xFsHQem7wuQ37dbxDxLVKCW1RuiOL0eEMCnJLVb4q
+    [type] => organizer
+    [email] => lingamthuva@gamail.com
+    [committee] => ComSociety
+    [chairPerson] => L.Thuvaragan
+)
+Array
+(
+    [username] => Organizer001
+    [password] => $2y$10$w92FBhuVTGQ0xFsHQem7wuQ37dbxDxLVKCW1RuiOL0eEMCnJLVb4q
+    [type] => organizer
+    [email] => comsociety@gamail.com
+    [committee] => ComSociety
+    [chairPerson] => L.Thuvaragan
+)
