@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Here, you can process the data, like sending an email or storing it in a database
     // For example, sending an email
     $to = "2021csc054@univ.jfn.ac.lk"; // Change to your email
-    $headers = "From: $name <$email>" . "\r\n" .
+    $headers = "From: $email" . "\r\n" .
                "Reply-To: $email" . "\r\n" .
                "X-Mailer: PHP/" . phpversion();
 
@@ -19,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Message sent successfully!";
     } else {
         echo "Failed to send message. Please try again later.";
+        error_log("Mail error: " . error_get_last()['message']);
     }
 }
 ?>
@@ -186,7 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
     </div>
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
+        <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
     </footer>
 </body>
 </html>

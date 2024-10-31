@@ -1,19 +1,31 @@
 <?php
 session_start();
+require_once 'db_connection.php'; // Include the database connection
 
-function loadEvents() {
-    $file = 'events.json';
-    if (!file_exists($file)) {
-        file_put_contents($file, json_encode([]));
+function loadEvents($db) {
+    $events = [];
+    $query = "SELECT eventID, name, committee, startDate, endDate, startTime,endTime,venue,flyer,userID FROM event"; // Include eventID
+    $result = $db->query($query);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $events[] = $row;
+        }
     }
-    return json_decode(file_get_contents($file), true);
+
+    return $events;
 }
 
-function saveEvents($events) {
-    file_put_contents('events.json', json_encode($events, JSON_PRETTY_PRINT));
+
+
+
+// Establish database connection
+$db = new mysqli($host, $user, $pass, $db);
+if ($db->connect_error) {
+    die("Connection failed: " . $db->connect_error);
 }
 // Load events for displaying
-$events = loadEvents();
+$events = loadEvents($db);
 $currentDate = date('Y-m-d'); // Get today's date in 'YYYY-MM-DD' format
 
 // Separate events into categories
@@ -30,9 +42,6 @@ foreach ($events as $event) {
         $upcomingEvents[] = $event;
     }
 }
-
-
-$events = loadEvents();
 ?>
 
 <!DOCTYPE html>
@@ -327,7 +336,7 @@ $events = loadEvents();
                     <div class="event-item">
                         <div>
                             <h3><?php echo htmlspecialchars($event['name']); ?></h3>
-                            <p>Event ID: <?php echo htmlspecialchars($event['id']); ?></p>
+                            <p>Event ID: <?php echo htmlspecialchars($event['eventID']); ?></p>
                             <p>Organizing Committee: <?php echo htmlspecialchars($event['committee']); ?></p>
                             <p>Date: <?php echo htmlspecialchars($event['startDate']); ?> to <?php echo htmlspecialchars($event['endDate']); ?></p>
                             <p>Time: <?php echo htmlspecialchars($event['startTime']); ?> to <?php echo htmlspecialchars($event['endTime']); ?></p>
@@ -361,7 +370,7 @@ $events = loadEvents();
                     <div class="event-item">
                         <div>
                             <h3><?php echo htmlspecialchars($event['name']); ?></h3>
-                            <p>Event ID: <?php echo htmlspecialchars($event['id']); ?></p>
+                            <p>Event ID: <?php echo htmlspecialchars($event['eventID']); ?></p>
                             <p>Organizing Committee: <?php echo htmlspecialchars($event['committee']); ?></p>
                             <p>Date: <?php echo htmlspecialchars($event['startDate']); ?> to <?php echo htmlspecialchars($event['endDate']); ?></p>
                             <p>Time: <?php echo htmlspecialchars($event['startTime']); ?> to <?php echo htmlspecialchars($event['endTime']); ?></p>
@@ -383,7 +392,7 @@ $events = loadEvents();
                             </p>
                         </div>
                         <div>
-                        <a href="student-registration.php?eventId=<?php echo htmlspecialchars($event['id']); ?>">Register</a>
+                        <a href="student-registration.php?eventId=<?php echo htmlspecialchars($event['eventID']); ?>">Register</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -399,7 +408,7 @@ $events = loadEvents();
                     <div class="event-item">
                         <div>
                             <h3><?php echo htmlspecialchars($event['name']); ?></h3>
-                            <p>Event ID: <?php echo htmlspecialchars($event['id']); ?></p>
+                            <p>Event ID: <?php echo htmlspecialchars($event['eventID']); ?></p>
                             <p>Organizing Committee: <?php echo htmlspecialchars($event['committee']); ?></p>
                             <p>Date: <?php echo htmlspecialchars($event['startDate']); ?> to <?php echo htmlspecialchars($event['endDate']); ?></p>
                             <p>Time: <?php echo htmlspecialchars($event['startTime']); ?> to <?php echo htmlspecialchars($event['endTime']); ?></p>
@@ -421,7 +430,7 @@ $events = loadEvents();
                             </p>
                         </div>
                         <div>
-                        <a href="student-registration.php?eventId=<?php echo htmlspecialchars($event['id']); ?>">Register</a>
+                        <a href="student-registration.php?eventId=<?php echo htmlspecialchars($event['eventID']); ?>">Register</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -430,7 +439,7 @@ $events = loadEvents();
     </div>
     </div>
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="student-contactUs.php">Contact Us</a> | <a href="student-about.php">About Us</a></p>
+        <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="student-contactUs.php">Contact Us</a> | <a href="student-about.php">About Us</a></p>
     </footer>
 </body>
 </html>

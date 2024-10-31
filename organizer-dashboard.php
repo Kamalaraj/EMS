@@ -1,45 +1,43 @@
 <?php
 session_start();
-
-// Load events from a JSON file (replace this with database queries if needed)
-function loadEvents() {
-    $file = 'events.json';
-    if (!file_exists($file)) {
-        file_put_contents($file, json_encode([]));
-    }
-    return json_decode(file_get_contents($file), true);
+require_once 'db_connection.php'; // Include database connection
+if (!isset($_SESSION['userID'])) {
+    header('Location: login.php'); // Redirect to login if not logged in
+    exit();
 }
 
-function saveEvents($events) {
-    file_put_contents('events.json', json_encode($events, JSON_PRETTY_PRINT));
-}
-// Load events for displaying
-$events = loadEvents();
-$currentDate = date('Y-m-d'); // Get today's date in 'YYYY-MM-DD' format
+$loggedInUserID = $_SESSION['userID']; // Store logged-in user's ID
 
-function loadUserData() {
-    $jsonFile = 'users.json'; // Update with the actual path to your JSON file
-    if (file_exists($jsonFile)) {
-        $jsonData = file_get_contents($jsonFile);
-        $users = json_decode($jsonData, true);
-        
-        // Assuming you have a mechanism to get the current user's identifier, like their username or ID
-        // Here, we'll simulate getting the current user from the session
-        $currentUserID = $_SESSION['userID'] ?? null; // Update as necessary to match your logic
-        
-        foreach ($users as $user) {
-            if ($user['userID'] == $currentUserID) {
-                $_SESSION['currentUser'] = $user; // Store the user data in the session
-                return $user;
-            }
+// Load events from the database
+function loadEvents($db) {
+    $events = [];
+    $query = "SELECT eventID, name, committee, startDate, endDate, startTime,endTime,venue,flyer,userID FROM event"; // Include eventID
+    $result = $db->query($query);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $events[] = $row;
         }
     }
-    return null; // Return null if user not found
-}
-// Get the logged-in organizer's ID
-$currentUser = $_SESSION['currentUser'];
 
-// Separate events into categories
+    return $events;
+}
+
+
+
+
+// Establish database connection
+$db = new mysqli($host, $user, $pass, $db);
+if ($db->connect_error) {
+    die("Connection failed: " . $db->connect_error);
+}
+
+
+
+// Load events and categorize them
+$events = loadEvents($db);
+$currentDate = date('Y-m-d'); // Get today's date in 'YYYY-MM-DD' format
+
 $previousEvents = [];
 $currentEvents = [];
 $upcomingEvents = [];
@@ -55,7 +53,6 @@ foreach ($events as $event) {
 }
 
 
-
 // Handle sign-out
 if (isset($_POST['signOut'])) {
     session_unset();
@@ -64,10 +61,8 @@ if (isset($_POST['signOut'])) {
     exit();
 }
 
-
-
-// Load events for displaying
-$events = loadEvents();
+// Close the database connection
+$db->close();
 ?>
 
 <!DOCTYPE html>
@@ -388,9 +383,9 @@ $events = loadEvents();
                             </p>
                         </div>
                         <div>
-                        <?php if ($event['userID'] === $currentUser['userID']): ?>
-                            <a href="student-detail.php?id=<?php echo $event['id']; ?>">View Student Details</a>
-                            <?php endif; ?>
+                        <?php if ($event['userID'] === $loggedInUserID): ?>
+                                    <a href="student-detail.php?id=<?php echo $event['eventID']; ?>">View Student Details</a>
+                                <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -427,10 +422,10 @@ $events = loadEvents();
                             </p>
                         </div>
                         <div>
-                        <?php if ($event['userID'] === $currentUser['userID']): ?>
-                            <a href="event-update.php?id=<?php echo $event['id']; ?>">Edit Event</a>
-                            <a href="student-detail.php?id=<?php echo $event['id']; ?>">View Student Details</a>
-                            <?php endif; ?>
+                                <?php if ($event['userID'] === $loggedInUserID): ?>
+                                    <a href="event-update.php?id=<?php echo $event['eventID']; ?>">Edit Event</a>
+                                    <a href="student-detail.php?id=<?php echo $event['eventID']; ?>">View Student Details</a>
+                                <?php endif; ?>
                         </div>
                         </div>
                     </div>
@@ -447,7 +442,7 @@ $events = loadEvents();
                     <div class="event-item">
                         <div>
                             <h3><?php echo htmlspecialchars($event['name']); ?></h3>
-                            <p>Event ID: <?php echo htmlspecialchars($event['id']); ?></p>
+                            <p>Event ID: <?php echo htmlspecialchars($event['eventID']); ?></p>
                             <p>Organizing Committee: <?php echo htmlspecialchars($event['committee']); ?></p>
                             <p>Date: <?php echo htmlspecialchars($event['startDate']); ?> to <?php echo htmlspecialchars($event['endDate']); ?></p>
                             <p>Time: <?php echo htmlspecialchars($event['startTime']); ?> to <?php echo htmlspecialchars($event['endTime']); ?></p>
@@ -455,25 +450,19 @@ $events = loadEvents();
                             <p class="flyer">Flyer/Poster: <br><br>
                                 <?php 
                                     if (!empty($event['flyer'])) {
-                                        $fileExtension = pathinfo($event['flyer'], PATHINFO_EXTENSION);
-                                        $flyerPath = htmlspecialchars($event['flyer']);
-                                        if (in_array($fileExtension, ['jpg', 'jpeg', 'png'])) {
-                                            echo '<img src="' . $flyerPath . '" alt="Event Flyer" style="max-width: 300px; height: auto;">';
-                                        } elseif ($fileExtension === 'pdf') {
-                                            echo '<a href="' . $flyerPath . '" target="_blank">View Flyer (PDF)</a>';
-                                        }
+                                        // Assuming `flyer` column stores binary data of image
+                                        $flyerData = base64_encode($event['flyer']); // Encode binary data to base64
+                                        echo '<img src="data:image/jpeg;base64,' . $flyerData . '" alt="Event Flyer" style="max-width: 300px; height: auto;">';
                                     } else {
                                         echo '<p>No flyer uploaded for this event.</p>';
                                     }
                                 ?>
-                            </p>
+                        </p>
                         </div>
-                        <div>
-                        <?php if ($event['userID'] === $currentUser['userID']): ?>
-                            <a href="event-update.php?id=<?php echo $event['id']; ?>">Edit Event</a>
-                            <a href="student-detail.php?id=<?php echo $event['id']; ?>">View Student Details</a>
-                            <?php endif; ?>
-                        </div>
+                                <?php if ($event['userID'] === $loggedInUserID): ?>
+                                    <a href="event-update.php?id=<?php echo $event['eventID']; ?>">Edit Event</a>
+                                    <a href="student-detail.php?id=<?php echo $event['eventID']; ?>">View Student Details</a>
+                                <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -487,7 +476,7 @@ $events = loadEvents();
     </div>
 
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="organizer-contactUs.php">Contact Us</a> | <a href="organizer-about.php">About Us</a></p>
+        <p>&copy;  <?php echo date("Y"); ?> Event Management System | <a href="organizer-contactUs.php">Contact Us</a> | <a href="organizer-about.php">About Us</a></p>
     </footer>
 </body>
 </html>

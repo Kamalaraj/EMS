@@ -1,7 +1,7 @@
 <?php
 // Database connection configuration
 $host = 'localhost';            // Database host
-$db = 'ems';                    // Replace with your EMS database name
+$db = 'group9';                    // Replace with your EMS database name
 $user = 'root';                 // Replace with your database username
 $pass = '';                     // Replace with your database password
 $charset = 'utf8mb4';           // Character set for database connection

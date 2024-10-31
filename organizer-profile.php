@@ -1,4 +1,5 @@
 <?php
+require_once 'db_connection.php';
 session_start();
 if (isset($_POST['signOut'])) {
     session_unset();
@@ -8,55 +9,53 @@ if (isset($_POST['signOut'])) {
 }
 
 // Check if the user is an organizer; otherwise, redirect to login page
-if (!isset($_SESSION['currentUser']) || $_SESSION['currentUser']['type'] !== 'organizer') {
-    echo "<script>alert('You must be an organizer to access this page.'); window.location.href = 'login-signup.php';</script>";
+if (!isset($_SESSION['usertype'])) {
+    echo "<script>alert('You must be an organizer to access this page.'); window.location.href = 'login.php';</script>";
     exit();
 }
 
-function loadUserData() {
-    $jsonFile = 'users.json'; // Update with the actual path to your JSON file
-    if (file_exists($jsonFile)) {
-        $jsonData = file_get_contents($jsonFile);
-        $users = json_decode($jsonData, true);
-        
-        // Assuming you have a mechanism to get the current user's identifier, like their username or ID
-        // Here, we'll simulate getting the current user from the session
-        $currentUserID = $_SESSION['userID'] ?? null; // Update as necessary to match your logic
-        
-        foreach ($users as $user) {
-            if ($user['userID'] == $currentUserID) {
-                $_SESSION['currentUser'] = $user; // Store the user data in the session
-                return $user;
-            }
+function loadUserData($pdo) {
+    $currentUserID = $_SESSION['userID'] ?? null;
+    if ($currentUserID) {
+        $stmt = $pdo->prepare("SELECT * FROM organizer WHERE userID = :userID");
+        $stmt->execute(['userID' => $currentUserID]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $_SESSION['currentUser'] = $user; // Store user data in the session
+            return $user;
         }
     }
-    return null; // Return null if user not found
+    return null;
 }
+
+// Fetch current user's details from database
+$currentUser = loadUserData($pdo);
 
 // Handle profile image upload
 if (isset($_POST['uploadImage'])) {
-    $targetDir = "./upload_organizer/"; // Folder to store uploaded images (ensure the trailing slash)
-    $targetFile = $targetDir . basename($_FILES["profileImage"]["name"]);
-    $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
-
-    // Check if the uploaded file is an image
-    $check = getimagesize($_FILES["profileImage"]["tmp_name"]);
-    if ($check !== false) {
-        // Move uploaded file to target directory
-        if (move_uploaded_file($_FILES["profileImage"]["tmp_name"], $targetFile)) {
-            // Update the session with the image path
-            $_SESSION['currentUser']['profile_image'] = $targetFile;
-            $currentUser['profile_image'] = $targetFile;
-
-            // Success message
-            echo "<script>alert('Profile image uploaded successfully!');</script>";
+    // Check if a file was uploaded
+    if (isset($_FILES["profileImage"]) && $_FILES["profileImage"]["error"] === UPLOAD_ERR_OK) {
+        // Read the image file
+        $imageData = file_get_contents($_FILES["profileImage"]["tmp_name"]);
+        
+        // Prepare to update the database with the image data
+        $userID = $_SESSION['currentUser']['userID']; // Assuming the user ID is stored in session
+        $stmt = $pdo->prepare("UPDATE organizer SET profileImage = ? WHERE userID = ?");
+        
+        // Execute the update with the binary image data
+        if ($stmt->execute([$imageData, $userID])) {
+            // Update the session with the image data (if needed)
+            $_SESSION['currentUser']['profileImage'] = $imageData;
+            echo "<script>alert('Profile image uploaded and saved in database successfully!');</script>";
         } else {
-            echo "<script>alert('Sorry, there was an error uploading your image.');</script>";
+            echo "<script>alert('Sorry, there was an error updating the database.');</script>";
         }
     } else {
-        echo "<script>alert('File is not an image.');</script>";
+        echo "<script>alert('No file uploaded or there was an upload error.');</script>";
     }
 }
+
 
 
 
@@ -254,14 +253,14 @@ $currentUser = $_SESSION['currentUser'];
         <h2>Organizer Profile</h2>
 
         <div class="profile-info">
-        <?php if (!empty($currentUser['profile_image'])): ?>
-    <div class="profile-image-container" style="position: relative; display: inline-block;">
-        <img src="<?php echo htmlspecialchars($currentUser['profile_image']); ?>" alt="Profile Image" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+        <?php if (!empty($currentUser['profileImage'])): ?>
+        <div class="profile-image-container" style="position: relative; display: inline-block;">
+        <img src="data:image/jpeg;base64,<?php echo base64_encode($currentUser['profileImage']); ?>" alt="Profile Image" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
         <span class="edit-icon" onclick="toggleUploadForm()" style="position: absolute; bottom: 10px; right: 10px; cursor: pointer; background-color: #007bff; color: white; padding: 5px; border-radius: 50%;">
             &#9998; <!-- This is a pencil/edit icon -->
         </span>
-    </div>
-<?php else: ?>
+        </div>
+    <?php else: ?>
     <div class="profile-image-container" style="position: relative; display: inline-block;">
         <img src="default-profile.png" alt="Default Profile Image" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
         <span class="edit-icon" onclick="toggleUploadForm()" style="position: absolute; bottom: 10px; right: 10px; cursor: pointer; background-color: #007bff; color: white; padding: 5px; border-radius: 50%;">
@@ -290,15 +289,15 @@ $currentUser = $_SESSION['currentUser'];
     }
 </script>
             <p><strong>Organizer ID:</strong> <?php echo isset($currentUser['userID']) ? htmlspecialchars($currentUser['userID']) : 'Not Available'; ?></p>
-            <p><strong>Organizing Committee Name:</strong> <?php echo htmlspecialchars($currentUser['committee']); ?></p>
-            <p><strong>Chair Person Name:</strong> <?php echo htmlspecialchars($currentUser['chairPerson']); ?></p>
-            <p><strong>E-mail:</strong> <?php echo htmlspecialchars($currentUser['organizer_email']); ?></p>
+            <p><strong>Organizing Committee Name:</strong> <?php echo htmlspecialchars($currentUser['committeeName']); ?></p>
+            <p><strong>Chair Person Name:</strong> <?php echo htmlspecialchars($currentUser['chairPersonName']); ?></p>
+            <p><strong>E-mail:</strong> <?php echo htmlspecialchars($currentUser['email']); ?></p>
             <p><strong>Username:</strong> <?php echo htmlspecialchars($currentUser['username']); ?></p>
         </div>
     </div>
 
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
+        <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
     </footer>
 </body>
 </html>

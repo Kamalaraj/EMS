@@ -1,39 +1,27 @@
 <?php
 session_start(); // Start the session
 
+// Include database connection file
+require_once 'db_connection.php';
+
 // Sanitize the event ID
 $eventId = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
 
 if (!$eventId) {
     die("Event ID is required to view student details.");
-} 
-
-// Function to get registrations from the JSON file
-function loadRegistrations($eventId) {
-    $file = "registrations/registration_{$eventId}.json";
-    
-    // Create file if it doesn't exist
-    if (!file_exists($file)) {
-        file_put_contents($file, json_encode([]));
-    }
-
-    $jsonContent = file_get_contents($file);
-    
-    // Check if reading the file was successful
-    if ($jsonContent === false) {
-        return []; // Return an empty array if there is an error
-    }
-
-    return json_decode($jsonContent, true);
 }
 
-// Retrieve registrations from the JSON file
-$registrations = loadRegistrations($eventId);
-
-// Filter registrations by event ID
-$eventRegistrations = array_filter($registrations, function($reg) use ($eventId) {
-    return isset($reg['eventId']) && $reg['eventId'] === $eventId;
-});
+try {
+    // Prepare the SQL query to fetch registration details for the given event ID
+    $stmt = $pdo->prepare("SELECT registrationID, userID, firstName, lastName, studentRegNo, levelOfStudy, registrationDate,approval 
+                           FROM registration 
+                           WHERE eventId = :eventId");
+    $stmt->bindParam(':eventId', $eventId, PDO::PARAM_STR);
+    $stmt->execute();
+    $eventRegistrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Error fetching registrations: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -213,18 +201,21 @@ $eventRegistrations = array_filter($registrations, function($reg) use ($eventId)
             <tbody id="studentTableBody">
                 <?php if (!empty($eventRegistrations)): ?>
                     <?php foreach ($eventRegistrations as $reg): ?>
-                        <tr data-registration-number="<?php echo htmlspecialchars($reg['registrationNumber']); ?>">
+                        <tr data-registration-number="<?php echo htmlspecialchars($reg['studentRegNo']); ?>">
                             <td><?php echo htmlspecialchars($reg['registrationID']); ?></td>
-                            <td><?php echo htmlspecialchars($reg['eventCreatorUserID']); ?></td>
+                            <td><?php echo htmlspecialchars($reg['userID']); ?></td>
                             <td><?php echo htmlspecialchars($reg['firstName']); ?></td>
                             <td><?php echo htmlspecialchars($reg['lastName']); ?></td>
-                            <td><?php echo htmlspecialchars($reg['registrationNumber']); ?></td>
+                            <td><?php echo htmlspecialchars($reg['studentRegNo']); ?></td>
                             <td><?php echo htmlspecialchars($reg['levelOfStudy']); ?></td>
                             <td><?php echo htmlspecialchars($reg['registrationDate']); ?></td>
                             <td>
-                                <button class="confirm-button" onclick="confirmRegistration('<?php echo htmlspecialchars($reg['registrationNumber']); ?>')">Confirm</button>
-                                <button class="reject-button" onclick="rejectRegistration('<?php echo htmlspecialchars($reg['registrationNumber']); ?>')">Reject</button>
-                            </td>
+                    <span><?php echo htmlspecialchars($reg['approval']); ?></span>
+                    <?php if ($reg['approval'] === 'Pending'): // Check if the approval status is still pending ?>
+                        <button class="confirm-button" onclick="confirmRegistration('<?php echo htmlspecialchars($reg['studentRegNo']); ?>')">Confirm</button>
+                        <button class="reject-button" onclick="rejectRegistration('<?php echo htmlspecialchars($reg['studentRegNo']); ?>')">Reject</button>
+                    <?php endif; ?>
+                </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -273,7 +264,7 @@ $eventRegistrations = array_filter($registrations, function($reg) use ($eventId)
         }
     </script>
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
+        <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
     </footer>
 </body>
 </html>

@@ -141,7 +141,7 @@
         <p>Our mission is to provide an intuitive and user-friendly system that enhances collaboration among organizers, fosters community engagement, and facilitates seamless event participation for everyone involved.</p>
     </div>
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
+        <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
     </footer>
 </body>
 </html>

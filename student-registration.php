@@ -1,6 +1,7 @@
 <?php
 session_start(); // Start the session for user management
-// Define the path to your JSON file
+
+require_once 'db_connection.php'; // Include the database connection file
 
 $error = '';
 $success = '';
@@ -8,78 +9,18 @@ $eventId = '';
 
 $eventId = isset($_GET['eventId']) ? htmlspecialchars($_GET['eventId']) : null;
 
+// Function to get Event Creator UserID
+function getEventCreatorUserID($pdo, $eventId) {
+    $db = "SELECT userID FROM event WHERE eventID = :eventId";
+    $stmt = $pdo->prepare($db);
+    $stmt->bindParam(':eventId', $eventId, PDO::PARAM_STR);
+    $stmt->execute();
+    $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
-
-// Check if the file exists before attempting to read
-
-function loadRegistrations($eventId) {
-    $file = "registrations/registration_{$eventId}.json";
-    
-    // Create file if it doesn't exist
-    if (!file_exists($file)) {
-        file_put_contents($file, json_encode([]));
-    }
-
-    $jsonContent = file_get_contents($file);
-    
-    // Check if reading the file was successful
-    if ($jsonContent === false) {
-        return []; // Return an empty array if there is an error
-    }
-
-    return json_decode($jsonContent, true);
-}
-// Retrieve registrations from the JSON file
-$registrations = loadRegistrations($eventId);
-
-// Function to save registrations to a JSON file for a specific event
-function saveRegistrations($eventId, $registrations) {
-    // Check if the registrations directory exists, if not create it
-    if (!file_exists('registrations')) {
-        mkdir('registrations', 0777, true); // Create directory if it doesn't exist
-    }
-
-    // Use double quotes for variable interpolation
-    $file = "registrations/registration_{$eventId}.json";
-    
-    // Attempt to write to the file and handle possible errors
-    if (file_put_contents($file, json_encode($registrations, JSON_PRETTY_PRINT)) === false) {
-        echo "Failed to write to file: $file";
-    } else {
-        //echo "Registrations saved successfully to: $file";
-    }
+    return $event['userID'] ?? 'Unknown';
 }
 
-// Function to get registrations from a JSON file for a specific event
-function getRegistrations($eventId) {
-    $file = "registrations/registration_{$eventId}.json"; // Use double quotes for variable interpolation
-    if (!file_exists($file)) {
-        return []; // Return an empty array if the file doesn't exist
-    }
-    return json_decode(file_get_contents($file), true);
-}
-
-function getEventCreatorUserID($eventId) {
-    $file = 'events.json';
-    
-    // Ensure events.json exists and read its contents
-    if (!file_exists($file)) {
-        return 'Unknown'; // Default value if file doesn't exist
-    }
-
-    $events = json_decode(file_get_contents($file), true);
-
-    // Search for the event by ID and return EventCreatorUserID if found
-    foreach ($events as $event) {
-        if (isset($event['id']) && $event['id'] === $eventId) {
-            return $event['userID'] ?? 'Unknown'; // Fallback to 'Unknown' if key isn't found
-        }
-    }
-    return 'Unknown'; // Return default if event ID isn't found
-}
-
-$eventCreatorUserID = getEventCreatorUserID($eventId);
+$eventCreatorUserID = getEventCreatorUserID($pdo, $eventId);
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -88,57 +29,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lastName = trim($_POST['lastName']);
     $registrationNumber = trim($_POST['registrationNumber']);
     $levelOfStudy = trim($_POST['levelOfStudy']);
-    $eventId = isset($_POST['eventId']) ? $_POST['eventId'] : '';
-    $eventId = isset($_POST['eventCreatorUserID']) ? $_POST['eventCreatorUserID'] : '';
-    $registrationDate = trim($_POST['registrationDate']);
-    $registrationID = trim($_POST['registrationID']);
-
-
-    
+    $registrationDate = date('Y-m-d'); // Set registration date
+    $registrationID = 'R' . strtoupper(substr(md5(uniqid(rand(), true)), 0, 9)); // Generate unique registration ID
 
     // Validate form data
     if (empty($firstName) || empty($lastName) || empty($registrationNumber) || empty($levelOfStudy)) {
         $error = "Please fill in all fields.";
     } else {
-        // Fetch existing registrations from the JSON file
-        $registrations = getRegistrations($eventId);
-
         // Check for duplicate registration number within the same event
-        foreach ($registrations as $reg) {
-            if ($reg['eventId'] === $eventId && $reg['registrationNumber'] === $registrationNumber) {
-                $error = "Registration number already exists for this event. Please use a different one.";
-                break;
+        $db = "SELECT * FROM registration WHERE eventID = :eventId AND studentRegNo = :registrationNumber";
+        $stmt = $pdo->prepare($db);
+        $stmt->bindParam(':eventId', $eventId, PDO::PARAM_STR);
+        $stmt->bindParam(':registrationNumber', $registrationNumber, PDO::PARAM_STR);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            $error = "Registration number already exists for this event. Please use a different one.";
+        } else {
+            // Insert registration data into the database
+            $db = "INSERT INTO registration (registrationID, eventID, userID, firstName, lastName, studentRegNo, levelOfStudy, registrationDate, approval) 
+                    VALUES (:registrationID, :eventId, :eventCreatorUserID, :firstName, :lastName, :registrationNumber, :levelOfStudy, :registrationDate, 'Pending')";
+            $stmt = $pdo->prepare($db);
+            $stmt->bindParam(':registrationID', $registrationID, PDO::PARAM_STR);
+            $stmt->bindParam(':eventId', $eventId, PDO::PARAM_STR);
+            $stmt->bindParam(':eventCreatorUserID', $eventCreatorUserID, PDO::PARAM_STR);
+            $stmt->bindParam(':firstName', $firstName, PDO::PARAM_STR);
+            $stmt->bindParam(':lastName', $lastName, PDO::PARAM_STR);
+            $stmt->bindParam(':registrationNumber', $registrationNumber, PDO::PARAM_STR);
+            $stmt->bindParam(':levelOfStudy', $levelOfStudy, PDO::PARAM_STR);
+            $stmt->bindParam(':registrationDate', $registrationDate, PDO::PARAM_STR);
+
+            if ($stmt->execute()) {
+                $success = "Registration successful!";
+                // Optionally, redirect to the dashboard
+                // header("Location: student-dashboard.php");
+                // exit();
+            } else {
+                $error = "Failed to save registration.";
             }
-        }
-
-        // If no errors, add new registration data
-        if (empty($error)) {
-            $registrationID = 'R' . strtoupper(substr(md5(uniqid(rand(), true)), 0, 9));
-            $registrationData = [
-                'registrationID' => $registrationID,
-                'eventId' => $eventId,
-                'eventCreatorUserID' => $eventCreatorUserID,
-                'firstName' => $firstName,
-                'lastName' => $lastName,
-                'registrationNumber' => $registrationNumber,
-                'levelOfStudy' => $levelOfStudy,
-                'registrationDate' => $registrationDate,
-                'type' => 'student',
-                'approval' => 'Pending'
-            ];
-            $registrations[] = $registrationData; // Add new registration
-
-            // Save registrations to JSON file for the specific event
-            saveRegistrations($eventId, $registrations);
-
-            $success = "Registration successful!";
-            // Optionally, redirect to the dashboard
-            // header("Location: student-dashboard.php");
-            // exit();
         }
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -339,7 +272,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </script>
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="student-contactUs.php">Contact Us</a> | <a href="student-about.php">About Us</a></p>
+        <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="student-contactUs.php">Contact Us</a> | <a href="student-about.php">About Us</a></p>
     </footer>
 </body>
 </html>

@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// Include database connection file
+require_once 'db_connection.php';
+
 // Get the event ID from the query string
 $eventId = isset($_GET['eventId']) ? htmlspecialchars($_GET['eventId']) : null;
 if (!$eventId) {
@@ -14,26 +17,25 @@ if (!$action || !$registrationNumber) {
     die(json_encode(["message" => "Invalid request parameters."]));
 }
 
-// Path to the JSON file based on event ID
-$file = "registrations/registration_{$eventId}.json";
+// Define the new approval status based on the action
+$approvalStatus = $action === 'confirm' ? 'Confirmed' : 'Rejected';
 
-// Load the registrations data
-$registrations = json_decode(file_get_contents($file), true);
+try {
+    // Prepare the SQL statement to update the approval status
+    $stmt = $pdo->prepare("UPDATE registration 
+                           SET approval = :approval 
+                           WHERE eventID = :eventId AND studentRegNo = :registrationNumber");
+    $stmt->bindParam(':approval', $approvalStatus, PDO::PARAM_STR);
+    $stmt->bindParam(':eventId', $eventId, PDO::PARAM_STR);
+    $stmt->bindParam(':registrationNumber', $registrationNumber, PDO::PARAM_STR);
 
-// Update the registration based on the action
-$updated = false;
-foreach ($registrations as &$registration) {
-    if ($registration['registrationNumber'] === $registrationNumber) {
-        $registration['approval'] = $action === 'confirm' ? 'Confirmed' : 'Rejected';
-        $updated = true;
-        break;
+    // Execute the query
+    if ($stmt->execute()) {
+        echo json_encode(["message" => "Registration status updated successfully."]);
+    } else {
+        echo json_encode(["message" => "Failed to update registration status."]);
     }
+} catch (PDOException $e) {
+    echo json_encode(["message" => "Error: " . $e->getMessage()]);
 }
-
-// Save the updated registrations back to the file
-if ($updated) {
-    file_put_contents($file, json_encode($registrations, JSON_PRETTY_PRINT));
-    echo json_encode(["message" => "Registration status updated successfully."]);
-} else {
-    echo json_encode(["message" => "Registration not found."]);
-}
+?>

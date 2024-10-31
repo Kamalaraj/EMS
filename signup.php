@@ -50,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $chairPersonName = htmlspecialchars(trim($_POST['chairPersonName']));
                     $email = htmlspecialchars(trim($_POST['organizer_email']));
                     if (isValidEmail($email)) {
-                        $stmt = $pdo->prepare("INSERT INTO organizer (userID, committeeName, chairPersonName, email) VALUES (?, ?, ?, ?)");
-                        $stmt->execute([$userID, $committeeName, $chairPersonName, $email]);
+                        $stmt = $pdo->prepare("INSERT INTO organizer (userID,username, committeeName, chairPersonName, email) VALUES (?, ?, ?, ?, ?)");
+                        $stmt->execute([$userID,$username, $committeeName, $chairPersonName, $email]);
                         $message = "Organizer signup successful!";
                     } else {
                         $message = "Invalid email format.";
@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $registrationNumber = htmlspecialchars(trim($_POST['registrationNumber']));
                     $levelOfStudy = htmlspecialchars(trim($_POST['levelOfStudy']));
                     if (isValidEmail($email)) {
-                        $stmt = $pdo->prepare("INSERT INTO student (userID, firstName, lastName, Reg_No, email, yearOfStudy) VALUES (?, ?, ?, ?, ?, ?)");
-                        $stmt->execute([$userID, $firstName, $lastName, $registrationNumber, $email, $levelOfStudy]);
+                        $stmt = $pdo->prepare("INSERT INTO student (userID,username, firstName, lastName, Reg_No, email, yearOfStudy) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([$userID,$username, $firstName, $lastName, $registrationNumber, $email, $levelOfStudy]);
                         $message = "Student signup successful!";
                     } else {
                         $message = "Invalid email format.";
@@ -315,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="contactUS.php">Contact Us</a> | <a href="about.php">About Us</a></p>
+        <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="contactUS.php">Contact Us</a> | <a href="about.php">About Us</a></p>
     </footer>
 
     <script>

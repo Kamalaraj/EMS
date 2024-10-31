@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if the user exists and verify the password
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['currentUser'] = $user;
+            $_SESSION['userID'] = $user['userID'];
+            $_SESSION['usertype'] = $user['usertype'];
 
             // Redirect based on user type
             if ($user['usertype'] === 'student') {
@@ -226,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <footer>
-        <p>&copy; 2024 Event Management System | <a href="contactUS.php">Contact Us</a> | <a href="about.php">About Us</a></p>
+        <p>&copy;<?php echo date("Y"); ?> 2024 Event Management System | <a href="contactUS.php">Contact Us</a> | <a href="about.php">About Us</a></p>
     </footer>
 </body>
 </html>
