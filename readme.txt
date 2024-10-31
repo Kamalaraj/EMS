@@ -1,2 +1,2 @@
-Database Name : ems
-Tables : User,Student,Organizer,Event,Registration
+Database Name : group9
+Tables : user,student,organizer,event,registration
