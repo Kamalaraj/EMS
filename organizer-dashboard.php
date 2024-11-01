@@ -361,7 +361,7 @@ $db->close();
                     <div class="event-item">
                         <div>
                             <h3><?php echo htmlspecialchars($event['name']); ?></h3>
-                            <p>Event ID: <?php echo htmlspecialchars($event['id']); ?></p>
+                            <p>Event ID: <?php echo htmlspecialchars($event['eventID']); ?></p>
                             <p>Organizing Committee: <?php echo htmlspecialchars($event['committee']); ?></p>
                             <p>Date: <?php echo htmlspecialchars($event['startDate']); ?> to <?php echo htmlspecialchars($event['endDate']); ?></p>
                             <p>Time: <?php echo htmlspecialchars($event['startTime']); ?> to <?php echo htmlspecialchars($event['endTime']); ?></p>
@@ -400,7 +400,7 @@ $db->close();
                     <div class="event-item">
                         <div>
                             <h3><?php echo htmlspecialchars($event['name']); ?></h3>
-                            <p>Event ID: <?php echo htmlspecialchars($event['id']); ?></p>
+                            <p>Event ID: <?php echo htmlspecialchars($event['eventID']); ?></p>
                             <p>Organizing Committee: <?php echo htmlspecialchars($event['committee']); ?></p>
                             <p>Date: <?php echo htmlspecialchars($event['startDate']); ?> to <?php echo htmlspecialchars($event['endDate']); ?></p>
                             <p>Time: <?php echo htmlspecialchars($event['startTime']); ?> to <?php echo htmlspecialchars($event['endTime']); ?></p>
