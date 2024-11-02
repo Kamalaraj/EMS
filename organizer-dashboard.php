@@ -34,10 +34,11 @@ if ($db->connect_error) {
 
 
 
-// Load events and categorize them
+// Load events for displaying
 $events = loadEvents($db);
 $currentDate = date('Y-m-d'); // Get today's date in 'YYYY-MM-DD' format
 
+// Separate events into categories
 $previousEvents = [];
 $currentEvents = [];
 $upcomingEvents = [];
@@ -361,7 +362,7 @@ $db->close();
                     <div class="event-item">
                         <div>
                             <h3><?php echo htmlspecialchars($event['name']); ?></h3>
-                            <p>Event ID: <?php echo htmlspecialchars($event['id']); ?></p>
+                            <p>Event ID: <?php echo htmlspecialchars($event['eventID']); ?></p>
                             <p>Organizing Committee: <?php echo htmlspecialchars($event['committee']); ?></p>
                             <p>Date: <?php echo htmlspecialchars($event['startDate']); ?> to <?php echo htmlspecialchars($event['endDate']); ?></p>
                             <p>Time: <?php echo htmlspecialchars($event['startTime']); ?> to <?php echo htmlspecialchars($event['endTime']); ?></p>
@@ -383,7 +384,8 @@ $db->close();
                             </p>
                         </div>
                         <div>
-                        <?php if ($event['userID'] === $loggedInUserID): ?>
+                                <?php if ($event['userID'] === $loggedInUserID): ?>
+
                                     <a href="student-detail.php?id=<?php echo $event['eventID']; ?>">View Student Details</a>
                                 <?php endif; ?>
                         </div>
@@ -400,7 +402,7 @@ $db->close();
                     <div class="event-item">
                         <div>
                             <h3><?php echo htmlspecialchars($event['name']); ?></h3>
-                            <p>Event ID: <?php echo htmlspecialchars($event['id']); ?></p>
+                            <p>Event ID: <?php echo htmlspecialchars($event['eventID']); ?></p>
                             <p>Organizing Committee: <?php echo htmlspecialchars($event['committee']); ?></p>
                             <p>Date: <?php echo htmlspecialchars($event['startDate']); ?> to <?php echo htmlspecialchars($event['endDate']); ?></p>
                             <p>Time: <?php echo htmlspecialchars($event['startTime']); ?> to <?php echo htmlspecialchars($event['endTime']); ?></p>
@@ -426,7 +428,6 @@ $db->close();
                                     <a href="event-update.php?id=<?php echo $event['eventID']; ?>">Edit Event</a>
                                     <a href="student-detail.php?id=<?php echo $event['eventID']; ?>">View Student Details</a>
                                 <?php endif; ?>
-                        </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -450,15 +451,20 @@ $db->close();
                             <p class="flyer">Flyer/Poster: <br><br>
                                 <?php 
                                     if (!empty($event['flyer'])) {
-                                        // Assuming `flyer` column stores binary data of image
-                                        $flyerData = base64_encode($event['flyer']); // Encode binary data to base64
-                                        echo '<img src="data:image/jpeg;base64,' . $flyerData . '" alt="Event Flyer" style="max-width: 300px; height: auto;">';
+                                        $fileExtension = pathinfo($event['flyer'], PATHINFO_EXTENSION);
+                                        $flyerPath = htmlspecialchars($event['flyer']);
+                                        if (in_array($fileExtension, ['jpg', 'jpeg', 'png'])) {
+                                            echo '<img src="' . $flyerPath . '" alt="Event Flyer" style="max-width: 300px; height: auto;">';
+                                        } elseif ($fileExtension === 'pdf') {
+                                            echo '<a href="' . $flyerPath . '" target="_blank">View Flyer (PDF)</a>';
+                                        }
                                     } else {
                                         echo '<p>No flyer uploaded for this event.</p>';
                                     }
                                 ?>
-                        </p>
+                            </p>
                         </div>
+                        <div>
                                 <?php if ($event['userID'] === $loggedInUserID): ?>
                                     <a href="event-update.php?id=<?php echo $event['eventID']; ?>">Edit Event</a>
                                     <a href="student-detail.php?id=<?php echo $event['eventID']; ?>">View Student Details</a>
@@ -468,7 +474,6 @@ $db->close();
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
-
         
     </div>
 

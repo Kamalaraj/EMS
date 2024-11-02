@@ -13,7 +13,7 @@ if (!$eventId) {
 
 try {
     // Prepare the SQL query to fetch registration details for the given event ID
-    $stmt = $pdo->prepare("SELECT registrationID, userID, firstName, lastName, studentRegNo, levelOfStudy, registrationDate,approval 
+    $stmt = $pdo->prepare("SELECT registrationID, organizerID,studentID, firstName, lastName, studentRegNo, levelOfStudy, registrationDate,approval 
                            FROM registration 
                            WHERE eventId = :eventId");
     $stmt->bindParam(':eventId', $eventId, PDO::PARAM_STR);
@@ -190,6 +190,7 @@ try {
                 <tr>
                     <th>Registration_ID</th>
                     <th>Event_Creator_ID</th>
+                    <th>Student_ID</th>
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Registration Number</th>
@@ -203,7 +204,8 @@ try {
                     <?php foreach ($eventRegistrations as $reg): ?>
                         <tr data-registration-number="<?php echo htmlspecialchars($reg['studentRegNo']); ?>">
                             <td><?php echo htmlspecialchars($reg['registrationID']); ?></td>
-                            <td><?php echo htmlspecialchars($reg['userID']); ?></td>
+                            <td><?php echo htmlspecialchars($reg['organizerID']); ?></td>
+                            <td><?php echo htmlspecialchars($reg['studentID']); ?></td>
                             <td><?php echo htmlspecialchars($reg['firstName']); ?></td>
                             <td><?php echo htmlspecialchars($reg['lastName']); ?></td>
                             <td><?php echo htmlspecialchars($reg['studentRegNo']); ?></td>

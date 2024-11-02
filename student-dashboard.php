@@ -320,6 +320,8 @@ foreach ($events as $event) {
     <div class="auth-container">
         <h2>Welcome, Student!</h2>
 
+        <button onclick="location.href='view-registrations.php'">View Registration details</button>
+
         <div class="tab-buttons">
             <button data-tab="current-events" class="active" onclick="showTab('current-events')">Current Events</button>
             <button data-tab="upcoming-events" onclick="showTab('upcoming-events')">Upcoming Events</button>

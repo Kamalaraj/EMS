@@ -20,6 +20,8 @@ function getEventCreatorUserID($pdo, $eventId) {
     return $event['userID'] ?? 'Unknown';
 }
 
+$studentID = $_SESSION['userID'];
+
 $eventCreatorUserID = getEventCreatorUserID($pdo, $eventId);
 
 // Handle form submission
@@ -47,12 +49,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "Registration number already exists for this event. Please use a different one.";
         } else {
             // Insert registration data into the database
-            $db = "INSERT INTO registration (registrationID, eventID, userID, firstName, lastName, studentRegNo, levelOfStudy, registrationDate, approval) 
-                    VALUES (:registrationID, :eventId, :eventCreatorUserID, :firstName, :lastName, :registrationNumber, :levelOfStudy, :registrationDate, 'Pending')";
+            // Corrected SQL insert statement
+            $db = "INSERT INTO registration (registrationID, eventID, organizerID, studentID, firstName, lastName, studentRegNo, levelOfStudy, registrationDate, approval) 
+            VALUES (:registrationID, :eventId, :eventCreatorUserID, :studentID, :firstName, :lastName, :registrationNumber, :levelOfStudy, :registrationDate, 'Pending')";
+
             $stmt = $pdo->prepare($db);
             $stmt->bindParam(':registrationID', $registrationID, PDO::PARAM_STR);
             $stmt->bindParam(':eventId', $eventId, PDO::PARAM_STR);
             $stmt->bindParam(':eventCreatorUserID', $eventCreatorUserID, PDO::PARAM_STR);
+            $stmt->bindParam(':studentID', $studentID, PDO::PARAM_STR);
             $stmt->bindParam(':firstName', $firstName, PDO::PARAM_STR);
             $stmt->bindParam(':lastName', $lastName, PDO::PARAM_STR);
             $stmt->bindParam(':registrationNumber', $registrationNumber, PDO::PARAM_STR);
@@ -240,6 +245,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form id="studentRegistrationForm" method="POST" action="">
             <input type="hidden" name="eventId" value="<?php echo htmlspecialchars($eventId); ?>">
             <input type="hidden" name="registrationID" value="<?php echo htmlspecialchars($registrationID); ?>">
+            <input type="hidden" name="studentID" value="<?php echo htmlspecialchars($studentID); ?>">
 
             <label for="firstName">First Name:</label>
             <input type="text" id="firstName" name="firstName" required>
@@ -265,7 +271,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
 
         <button id="backButton" onclick="goBack()">Back to Events</button>
-    </div>
+        </div>
     <script>
         function goBack() {
             window.history.back(); // Go back to the previous page

@@ -1,86 +1,66 @@
 <?php
-session_start();
-require_once 'db_connection.php'; // Include database connection
-if (!isset($_SESSION['userID'])) {
-    header('Location: login.php'); // Redirect to login if not logged in
-    exit();
+require_once 'db_connection.php'; // Include your database connection
+// Initialize message variable
+$message = '';
+$event = null; // Initialize the event variable
+
+// Check if 'id' is set in the URL
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $eventID = htmlspecialchars(trim($_GET['id']));
+
+    // Fetch the event details from the database
+    $stmt = $pdo->prepare("SELECT * FROM event WHERE eventID = ?");
+    $stmt->execute([$eventID]);
+    $event = $stmt->fetch();
+
+    if (!$event) {
+        $error = "Event not found.";
+    }
+} else {
+    $error = "No event ID provided.";
 }
-
-$loggedInUserID = $_SESSION['userID']; // Store logged-in user's ID
-
-// Check if the event ID is provided in the URL
-if (!isset($_GET['id'])) {
-    die("Event ID not provided.");
-}
-
-$eventID = $_GET['id'];
-
-// Load the event details from the database
-function loadEvent($db, $eventID) {
-    $query = "SELECT * FROM event WHERE eventID = ?";
-    $stmt = $db->prepare($query);
-    $stmt->bind_param("s", $eventID); // Bind the eventID parameter
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    return $result->fetch_assoc();
-}
-
-// Establish database connection
-$db = new mysqli($host, $user, $pass, $db);
-if ($db->connect_error) {
-    die("Connection failed: " . $db->connect_error);
-}
-
-// Get the current event details
-$event = loadEvent($db, $eventID);
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'];
-    $committee = $_POST['committeeName'];
-    $startDate = $_POST['startDate'];
-    $endDate = $_POST['endDate'];
-    $startTime = $_POST['startTime'];
-    $endTime = $_POST['endTime'];
-    $venue = $_POST['venue'];
-    $flyer = '';
-    
- // Optional: Handle file upload for the flyer
-$flyer = file_get_contents($_FILES['flyer']['tmp_name']); // Get the binary data of the uploaded file
+    // Validate and sanitize input data
+    $eventName = htmlspecialchars(trim($_POST['eventName']));
+    $organizingCommittee = htmlspecialchars(trim($_POST['committeeName']));
+    $startDate = htmlspecialchars(trim($_POST['startDate']));
+    $endDate = htmlspecialchars(trim($_POST['endDate']));
+    $startTime = htmlspecialchars(trim($_POST['startTime']));
+    $endTime = htmlspecialchars(trim($_POST['endTime']));
+    $venue = htmlspecialchars(trim($_POST['venue']));
+    $flyer = $event['flyer']; // Default to existing flyer
 
-// Update query
-$updateQuery = "UPDATE event SET name=?, committee=?, startDate=?, endDate=?, startTime=?, endTime=?, venue=?";
+    // Handle file upload
+    if (isset($_FILES['flyer']) && $_FILES['flyer']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['flyer']['tmp_name'];
+        $fileName = $_FILES['flyer']['name'];
+        $fileSize = $_FILES['flyer']['size'];
+        $fileType = $_FILES['flyer']['type'];
 
-if (!empty($flyer)) {
-    $updateQuery .= ", flyer=?";
+        $allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+        if (in_array($fileType, $allowedTypes) && $fileSize < 5000000) { // Max size 5MB
+            // Read the file content
+            $flyer = file_get_contents($fileTmpPath);
+        } else {
+            $error = "Invalid file type or size. Please upload a JPEG, PNG, or PDF file under 5MB.";
+        }
+    }
+
+    // Update event details in the database
+    if (empty($error)) {
+        try {
+            $stmt = $pdo->prepare("UPDATE event SET name = ?, committee = ?, startDate = ?, endDate = ?, startTime = ?, endTime = ?, venue = ?, flyer = ? WHERE eventID = ?");
+            $stmt->execute([$eventName, $organizingCommittee, $startDate, $endDate, $startTime, $endTime, $venue, $flyer, $eventID]);
+
+            $message = "Event updated successfully!";
+        } catch (PDOException $e) {
+            $error = "Error updating event: " . $e->getMessage();
+        }
+    }
 }
-
-$updateQuery .= " WHERE eventID=?";
-
-$stmt = $db->prepare($updateQuery);
-
-// Bind parameters
-if (!empty($flyer)) {
-    $stmt->bind_param("ssssssssi", $name, $committee, $startDate, $endDate, $startTime, $endTime, $venue, $flyer, $eventID);
-} else {
-    $stmt->bind_param("sssssssi", $name, $committee, $startDate, $endDate, $startTime, $endTime, $venue, $eventID);
-}
-
-// Execute the update
-if ($stmt->execute()) {
-    header("Location: organizer-dashboard.php"); // Redirect back to the dashboard
-    exit();
-} else {
-    echo "Error updating event: " . $stmt->error;
-}
-
-}
-
-// Close the database connection
-$db->close();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -90,7 +70,6 @@ $db->close();
     <title>Update Event</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* General Styling */
         * {
             margin: 0;
             padding: 0;
@@ -112,7 +91,7 @@ $db->close();
             justify-content: space-between;
             align-items: center;
             background-color: #07257F;
-            padding: 1px 30px;
+            padding: 5px 30px;
             position: absolute;
             top: 0;
             left: 0;
@@ -149,7 +128,7 @@ $db->close();
             border-radius: 8px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             text-align: center;
-            margin-top: 65px; /* Adjust to leave space for navbar */
+            margin-top: 75px; /* Adjust to leave space for navbar */
         }
 
         h2 {
@@ -246,67 +225,83 @@ $db->close();
         }
 
         footer a:hover {
+            color: #ffcc00;
             text-decoration: underline;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <nav>
-    <div style="display: flex; align-items: center;">
-            <img src="image/logo.png" alt="Logo"> <!-- Replace with your logo path -->
-            <a style="padding: 20px 20px;" href="organizer-dashboard.php">Dashboard</a>
+        <div style="display: flex; align-items: center;">
+            <img src="image/logo.png" alt="Logo">
+            <a href="organizer-dashboard.php">Dashboard</a>
         </div>
         <div>
-            <a href="admin-dashboard.php">Admin Dashboard</a>
-            <a href="events.php">View Events</a>
-            <a href="sign-out.php">Sign Out</a>
+            <a href="organizer-about.php">About Us</a>
+            <a href="organizer-contactUs.php">Contact Us</a>
+            <a href="organizer-profile.php">Profile</a>
+            <a href="login.php">Sign out</a>
         </div>
     </nav>
 
     <div class="event-container">
-    <h2>Update Event Details</h2>
-    <form action="" method="post" enctype="multipart/form-data">
-        
-        <label for="name">Event Name:</label>
-        <input type="text" name="name" value="<?php echo htmlspecialchars($event['name']); ?>" required>
-        
-        <label for="organizingCommittee">Organizing Committee:</label>
-            <select id="committeeName" name="committeeName">
-                <option value="ComSociety">ComSociety</option>
-                <option value="IEEE-StudentBranch">IEEE-StudentBranch</option>
-                <option value="IEEE-WIE">IEEE-WIE</option>
-            </select>
-        
-        <label for="startDate">Start Date:</label>
-        <input type="date" name="startDate" value="<?php echo htmlspecialchars($event['startDate']); ?>" required>
-        
-        <label for="endDate">End Date:</label>
-        <input type="date" name="endDate" value="<?php echo htmlspecialchars($event['endDate']); ?>" required>
-        
-        <label for="startTime">Start Time:</label>
-        <input type="time" name="startTime" value="<?php echo htmlspecialchars($event['startTime']); ?>" required>
-        
-        <label for="endTime">End Time:</label>
-        <input type="time" name="endTime" value="<?php echo htmlspecialchars($event['endTime']); ?>" required>
-        
-        <label for="venue">Venue:</label>
-            <select id="venue" name="venue" required>
-                <option value="">Select Venue</option>
-                <option value="DCS Auditorium">DCS Auditorium</option>
-                <option value="CSL 1 and 2">CSL 1 and 2</option>
-                <option value="CSL 3 and 4">CSL 3 and 4</option>
-            </select>
-        
-        <label for="flyer">Event Flyer (Optional):</label>
-        <input type="file" name="flyer" accept="image/*,application/pdf">
-        
-        <button type="submit">Update Event</button>
-            <button type="button" id="backButton" onclick="window.location.href='Organizer-dashboard.php'">Back</button>
-        </form>
+        <h2>Update Event</h2>
+
+        <!-- Display messages -->
+        <?php if (!empty($message)): ?>
+            <p class="message"><?php echo $message; ?></p>
+        <?php endif; ?>
+        <?php if (!empty($error)): ?>
+            <p class="error"><?php echo $error; ?></p>
+        <?php endif; ?>
+
+        <?php if ($event): ?>
+            <form method="POST" enctype="multipart/form-data" action="event-update.php?id=<?php echo $eventID; ?>">
+                <label for="eventName">Event Name:</label>
+                <input type="text" id="eventName" name="eventName" value="<?php echo htmlspecialchars($event['name']); ?>" required>
+
+                <label for="organizingCommittee">Organizing Committee:</label>
+                <select id="committeeName" name="committeeName">
+                    <option value="ComSociety" <?php echo $event['committee'] === 'ComSociety' ? 'selected' : ''; ?>>ComSociety</option>
+                    <option value="IEEE-StudentBranch" <?php echo $event['committee'] === 'IEEE-StudentBranch' ? 'selected' : ''; ?>>IEEE-StudentBranch</option>
+                    <option value="IEEE-WIE" <?php echo $event['committee'] === 'IEEE-WIE' ? 'selected' : ''; ?>>IEEE-WIE</option>
+                </select>
+
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" value="<?php echo htmlspecialchars($event['startDate']); ?>" required>
+
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate" value="<?php echo htmlspecialchars($event['endDate']); ?>" required>
+
+                <label for="startTime">Start Time:</label>
+                <input type="time" id="startTime" name="startTime" value="<?php echo htmlspecialchars($event['startTime']); ?>" required>
+
+                <label for="endTime">End Time:</label>
+                <input type="time" id="endTime" name="endTime" value="<?php echo htmlspecialchars($event['endTime']); ?>" required>
+
+                <label for="venue">Venue:</label>
+                <select id="venue" name="venue" required>
+                    <option value="DCS Auditorium" <?php echo $event['venue'] === 'DCS Auditorium' ? 'selected' : ''; ?>>DCS Auditorium</option>
+                    <option value="CSL 1 and 2" <?php echo $event['venue'] === 'CSL 1 and 2' ? 'selected' : ''; ?>>CSL 1 and 2</option>
+                    <option value="CSL 3 and 4" <?php echo $event['venue'] === 'CSL 3 and 4' ? 'selected' : ''; ?>>CSL 3 and 4</option>
+                </select>
+
+                <label for="flyer">Upload Flyer or Poster:</label>
+                <input type="file" id="flyer" name="flyer" accept=".jpg, .jpeg, .png, .pdf">
+                
+                <button type="submit">Update Event</button>
+            </form>
+        <?php endif; ?>
+        <button onclick="window.location.href='organizer-dashboard.php'">Back to Events</button>
     </div>
 
     <footer>
-        <p>&copy;  <?php echo date("Y"); ?> Event Management System | <a href="organizer-contactUs.php">Contact Us</a> | <a href="organizer-about.php">About Us</a></p>
+        <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="Organizer-contactUs.php">Contact Us</a> | <a href="Organizer-about.php">About Us</a></p>
     </footer>
 </body>
 </html>
