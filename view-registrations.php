@@ -163,7 +163,7 @@ $registrations = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <tr>
                 <th>Registration ID</th>
                 <th>Event ID</th>
-                <th>Organizer ID</th>
+                <th>Event_creator ID</th>
                 <th>Student ID</th>
                 <th>First Name</th>
                 <th>Last Name</th>
