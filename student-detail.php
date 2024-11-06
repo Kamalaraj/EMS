@@ -31,57 +31,71 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registered Students</title>
     <style>
-        /* General Styles */
-        * {
+       /* General Reset */
+       * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        /* Body Styling */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #A1C4FD, #C2E9FB);
+            font-family: Arial, sans-serif;
+            color: #333;
+            background: linear-gradient(to right, #A1C4FD, #C2E9FB); /* Gradient background */
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             line-height: 1.5;
-            margin-top: 90px;
-            width: 100%;
-            padding: 10px;
         }
+
+        /* Sticky Navbar */
         nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #07257F;
-            padding: 10px 30px;
-            position: absolute;
-            top: 0;
-            left: 0;
+            color: white;
+            padding: 5px 10px;
             width: 100%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
+
         nav img {
             height: 60px;
+            width: auto;
+            margin-right: 20px;
             border-radius: 10px;
         }
+
+        nav h1 {
+            font-size: 1.5em;
+            margin: 0;
+            color: white;
+        }
+
         nav a {
-            color: black;
-            background: white;
+            color: white;
             padding: 10px 20px;
             text-decoration: none;
             margin: 0 10px;
-            border-radius: 24px;
-            font-size: 20px;
+            border-radius: 14px;
+            font-size: 18px;
             transition: background-color 0.3s ease;
         }
+
         nav a:hover {
-            background-color: #7D7F86;
+            background-color: #91A7BF;
+            color:blue;
         }
         /* Container Styles */
         .container {
-            max-width: 1200px;
+            width: 75%;
             margin: 20px auto;
-            padding: 20px;
+            padding: 50px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -92,15 +106,23 @@ try {
             color: #333;
         }
         /* Table Styles */
+        /* Table Styles */
+        .table-responsive {
+            overflow-x: auto;
+            max-width: 100%; /* Enables horizontal scrolling */
+        }
         table {
             width: 100%;
+            max-width: 100%; /* Prevents table from exceeding container */
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 20px auto;
+            table-layout: auto;
         }
         th, td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
         }
         th {
             background-color: #4CAF50;
@@ -146,25 +168,68 @@ try {
         .reject-button:hover {
             background-color: #c82333;
         }
+        /* Sticky Footer */
         footer {
             background-color: #07257F;
             color: white;
             text-align: center;
             padding: 15px;
             font-size: 16px;
-            position: absolute;
-            bottom: 0;
+            margin-top: auto;
+            position: sticky; /* Change to sticky */
+            bottom: 0; /* Stick to the bottom */
             left: 0;
             width: 100%;
+        }
+        footer p{
+            color:white;
         }
         footer a {
             color: white;
             text-decoration: none;
-            padding: 0 10px;
+            font-size:15px;
         }
+
         footer a:hover {
             color: #ffcc00;
+            font-size:16px;
             text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            nav img {
+                height: 40px; /* Adjust logo height for mobile */
+            }
+            .container{
+                padding:20px;
+            }
+            nav a {
+                font-size: 18px; /* Adjust font size for links */
+            }
+            table {
+                font-size: 14px; /* Smaller font size on mobile */
+            }
+
+            th, td {
+                padding: 8px; /* Reduced padding for better fit */
+            }
+
+            /* Adjust column width on smaller screens */
+            th:nth-child(1), td:nth-child(1) { width: 10%; } /* Registration_ID */
+            th:nth-child(2), td:nth-child(2) { width: 15%; } /* Event_Creator_ID */
+            th:nth-child(3), td:nth-child(3) { width: 10%; } /* Student_ID */
+            th:nth-child(4), td:nth-child(4) { width: 20%; } /* First Name */
+            th:nth-child(5), td:nth-child(5) { width: 20%; } /* Last Name */
+            th:nth-child(6), td:nth-child(6) { width: 15%; } /* Registration Number */
+            th:nth-child(7), td:nth-child(7) { width: 10%; } /* Level of Study */
+            th:nth-child(8), td:nth-child(8) { width: 15%; } /* Registration Date */
+            th:nth-child(9), td:nth-child(9) { width: 15%; } /* Approval */
         }
     </style>
 </head>
@@ -172,19 +237,19 @@ try {
     <nav>
         <div style="display: flex; align-items: center;">
             <img src="image/logo.png" alt="Logo"> <!-- Replace with your logo path -->
-            <a style="padding: 10px 20px;" href="organizer-dashboard.php">Dashboard</a>
+            <h1>Event Management System</h1>
         </div>
         <div>
+            <a href="organizer-dashboard.php">Dashboard</a>
             <a href="organizer-about.php">About Us</a>
             <a href="organizer-contactUS.php">Contact Us</a>
             <a href="organizer-profile.php">Profile</a>
-            <a href="login.php" style="background: white; border: none; color: black; cursor: pointer; padding: 10px 20px; margin-right: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 24px; font-size: 20px; transition: background-color 0.3s ease;"
-               onmouseover="this.style.backgroundColor='#7D7F86'; this.style.color = 'white';"
-               onmouseout="this.style.backgroundColor='white'; this.style.color='black';">Sign out</a>
+            <a href="login.php">Sign Out</a>
         </div>
     </nav>
     <div class="container">
         <h1>Registered Students for Event ID: <?php echo htmlspecialchars($eventId); ?></h1>
+        <div class="table-responsive">
         <table>
             <thead>
                 <tr>
@@ -222,11 +287,12 @@ try {
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="5">No students registered for this event.</td>
+                        <td colspan="9">No students registered for this event.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
         <button id="backButton" onclick="goBack()">Back to Events</button>
     </div>
     <script>

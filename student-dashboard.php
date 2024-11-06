@@ -51,8 +51,8 @@ foreach ($events as $event) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
     <style>
-     /* General Reset */
-     * {
+    /* General Reset */
+    * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -67,50 +67,59 @@ foreach ($events as $event) {
             display: flex;
             flex-direction: column;
             line-height: 1.5;
-            margin-top:10px;
         }
 
-        /* Navigation Bar */
+        /* Sticky Navbar */
         nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #07257F;
-            padding: 10px 30px;
-            position: absolute;
-            top: 0;
-            left: 0;
+            color: white;
+            padding: 5px 10px;
             width: 100%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         nav img {
             height: 60px;
+            width: auto;
+            margin-right: 20px;
             border-radius: 10px;
         }
 
+        nav h1 {
+            font-size: 1.5em;
+            margin: 0;
+            color: white;
+        }
+
         nav a {
-            color: black;
+            color: white;
             padding: 10px 20px;
             text-decoration: none;
             margin: 0 10px;
-            border-radius: 24px;
-            font-size: 20px;
+            border-radius: 14px;
+            font-size: 18px;
             transition: background-color 0.3s ease;
-            background-color: white;
         }
 
         nav a:hover {
-            background-color: #7D7F86;
+            background-color: #91A7BF;
+            color:blue;
         }
+
 
         /* Container Styling */
         .auth-container {
-            width: 90%;
-            max-width: 1000px;
+            width: 100%;
+            max-width: 1500px;
             background-color: #EBE3DA;
             padding: 30px;
-            margin: 80px auto;
+            margin:30px auto;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
@@ -127,8 +136,9 @@ foreach ($events as $event) {
         #eventList {
             margin-top: 30px;
         }
-        #eventList h2{
-            color:#183487;
+
+        #eventList h2 {
+            color: #183487;
         }
 
         /* Event Item Styling */
@@ -138,6 +148,7 @@ foreach ($events as $event) {
             margin-bottom: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            font-size:20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -145,7 +156,7 @@ foreach ($events as $event) {
 
         .event-item h3 {
             font-size: 1.8em;
-            color:#183487;
+            color: #183487;
         }
 
         .event-item p {
@@ -153,7 +164,6 @@ foreach ($events as $event) {
             font-size: 1em;
             color: #333;
         }
-        
 
         .event-item a {
             text-decoration: none;
@@ -163,8 +173,8 @@ foreach ($events as $event) {
             border-radius: 10px;
             margin-left: 10px;
             transition: background-color 0.3s ease;
-            float:left;
-            display:inline-block;
+            float: left;
+            display: inline-block;
         }
 
         .event-item a:hover {
@@ -174,10 +184,11 @@ foreach ($events as $event) {
         /* Button Styling */
         .auth-container button {
             display: inline-block;
-            margin: 5px;
+            margin-top: 2px;
             padding: 10px 20px;
             font-size: 1em;
             color: #ffffff;
+            font-size:20px;
             background-color: #007bff;
             border: none;
             border-radius: 10px;
@@ -189,6 +200,7 @@ foreach ($events as $event) {
         .auth-container button:hover {
             background-color: #0056b3;
         }
+
         /* Flyer Section Styling */
         .flyer {
             background-color: #f9f9f9;
@@ -236,6 +248,7 @@ foreach ($events as $event) {
             font-style: italic;
             color: #666;
         }
+
         .tab-buttons {
             display: flex;
             justify-content: center;
@@ -264,25 +277,66 @@ foreach ($events as $event) {
         .tab-content.active {
             display: block; /* Show the active section */
         }
-         /* Footer Styling */
-         footer {
+
+        /* Sticky Footer */
+        footer {
             background-color: #07257F;
             color: white;
             text-align: center;
             padding: 15px;
             font-size: 16px;
             margin-top: auto;
+            position: sticky; /* Change to sticky */
+            bottom: 0; /* Stick to the bottom */
+            left: 0;
+            width: 100%;
         }
-
+        footer p{
+            color:white;
+        }
         footer a {
             color: white;
             text-decoration: none;
-            padding: 0 10px;
+            font-size:15px;
         }
 
         footer a:hover {
             color: #ffcc00;
+            font-size:16px;
             text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            nav img {
+                height: 40px; /* Adjust logo height for mobile */
+            }
+
+            nav a {
+                font-size: 18px; /* Adjust font size for links */
+            }
+
+            .auth-container {
+                padding: 20px;
+            }
+
+            .event-item h3 {
+                font-size: 1.5em; /* Smaller heading size for mobile */
+            }
+
+            .flyer img {
+                max-width: 100%; /* Ensure images are responsive */
+                height: auto; /* Maintain aspect ratio */
+            }
+
+            .tab-buttons button {
+                padding: 8px 15px; /* Adjust button padding for smaller screens */
+            }
         }
     </style>
     <script>
@@ -307,9 +361,10 @@ foreach ($events as $event) {
     <nav>
         <div style="display: flex; align-items: center;">
             <img src="image/logo.png" alt="Logo"> <!-- Replace with your logo path -->
-            <a href="student-dashboard.php">Dashboard</a>
+            <h1>Event Management System</h1>
         </div>
         <div>
+            <a href="student-dashboard.php">Dashboard</a>
             <a href="student-about.php">About Us</a>
             <a href="student-contactUS.php">Contact Us</a>
             <a href="student-profile.php">Profile</a>

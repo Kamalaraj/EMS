@@ -5,55 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Event Management System</title>
     <style>
-        /* General Reset */
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #A1C4FD, #C2E9FB);
+     /* General Reset */
+     * {
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column; /* Arrange elements vertically */
-            min-height: 100vh; /* Full height for body */
+            box-sizing: border-box;
         }
 
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background: linear-gradient(to right, #A1C4FD, #C2E9FB); /* Gradient background */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        /* Sticky Navbar */
         nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
             display: flex;
             justify-content: space-between;
-            color:white;
             align-items: center;
-            background-color: #07257F; /* Semi-transparent blue */
-            padding: 10px 20px;
-            width: 100%; /* Make sure the nav takes full width */
+            background-color: #07257F;
+            color: white;
+            padding: 5px 10px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         nav img {
-            height: 60px; /* Increase logo height */
-            width: auto; /* Maintain aspect ratio */
-            margin-right: 20px; /* Space between logo and links */
+            height: 60px;
+            width: auto;
+            margin-right: 20px;
             border-radius: 10px;
         }
 
+        nav h1 {
+            font-size: 1.5em;
+            margin: 0;
+            color: white;
+        }
+
         nav a {
-            color: black;
-            background:white;
-            padding: 10px 20px; /* Reduce padding for better alignment */
+            color: white;
+            padding: 10px 20px;
             text-decoration: none;
             margin: 0 10px;
-            border-radius: 24px;
-            font-size: 20px; /* Slightly smaller font size for better spacing */
+            border-radius: 14px;
+            font-size: 18px;
             transition: background-color 0.3s ease;
         }
 
         nav a:hover {
-            background-color: #7D7F86;
+            background-color: #91A7BF;
+            color:blue;
         }
 
         /* About Us Container */
         .about-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1500px;
             background-color:#E0E0AA;
-            padding: 40px;
+            padding: 60px;
             margin: 100px auto;
             border-radius: 15px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -81,27 +99,52 @@
             font-size: 16px; /* Font size for body text */
         }
 
+        /* Sticky Footer */
         footer {
-            background-color: #07257F; /* Match with the navbar color */
+            background-color: #07257F;
             color: white;
             text-align: center;
             padding: 15px;
             font-size: 16px;
-            margin-top: auto; /* Ensures footer stays at the bottom */
+            margin-top: auto;
+            position: sticky; /* Change to sticky */
+            bottom: 0; /* Stick to the bottom */
+            left: 0;
             width: 100%;
-            position: relative;
         }
-
+        footer p{
+            color:white;
+        }
         footer a {
             color: white;
             text-decoration: none;
-            padding: 0 10px;
+            font-size:15px;
         }
 
-       
         footer a:hover {
-            color: #ffcc00; /* Highlight on hover */
-            text-decoration: underline; /* Underline on hover */
+            color: #ffcc00;
+            font-size:16px;
+            text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            nav img {
+                height: 40px; /* Adjust logo height for mobile */
+            }
+
+            nav a {
+                font-size: 18px; /* Adjust font size for links */
+            }
+
+            .about-container {
+                padding: 20px;
+            }
         }
 
     </style>
@@ -110,19 +153,14 @@
 <nav>
         <div style="display: flex; align-items: center;">
             <img src="image/logo.png" alt="Logo"> <!-- Replace with your logo path -->
-            <a href="student-dashboard.php">Dashboard</a>
+            <h1>Event Management System</h1>
         </div>
         <div>
+            <a href="student-dashboard.php">Dashboard</a>
             <a href="student-about.php">About Us</a>
             <a href="student-contactUs.php">contact Us</a>
             <a href="student-profile.php">Profile</a>
-            <a href="login.php" style="background: white; border: none; color: black; cursor: pointer; 
-            padding: 14px 20px;margin-right:30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 24px; font-size: 20px; transition: background-color 0.3s ease;"
-            onmouseover="this.style.backgroundColor='#7D7F86'; this.style.color = 'white';" 
-            onmouseout="this.style.backgroundColor='white'; this.style.color = 'black';">
-            Sign out
-            </a>
+            <a href="login.php">Sign Out</a>
         </div>
     </nav>
 

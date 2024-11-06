@@ -30,51 +30,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Contact Us</title>
     <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to right, #A1C4FD, #C2E9FB);
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column; /* Arrange elements vertically */
-        min-height: 100vh; /* Full height for body */
-    }
+    /* General Reset */
+   * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    nav {
-        display: flex;
-        justify-content: space-between;
-        color: white;
-        align-items: center;
-        background-color: #07257F; /* Navbar background color */
-        padding: 10px 20px;
-        width: 100%; /* Make sure the nav takes full width */
-        position: fixed; /* Fixed position */
-        top: 0; /* Stick to the top */
-        left: 0; /* Align with the left edge */
-        z-index: 1000; /* Stay on top of other content */
-    }
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background: linear-gradient(to right, #A1C4FD, #C2E9FB); /* Gradient background */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
 
-    nav img {
-        height: 60px; /* Increase logo height */
-        width: auto; /* Maintain aspect ratio */
-        margin-right: 20px; /* Space between logo and links */
-        border-radius: 10px;
-    }
+        /* Sticky Navbar */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #07257F;
+            color: white;
+            padding: 5px 10px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
 
-    nav a {
-        color: white;
-        padding: 10px 20px; /* Reduce padding for better alignment */
-        text-decoration: none;
-        margin: 0 10px;
-        border-radius: 14px;
-        font-size: 18px; /* Slightly smaller font size for better spacing */
-        transition: background-color 0.3s ease;
-    }
+        nav img {
+            height: 60px;
+            width: auto;
+            margin-right: 20px;
+            border-radius: 10px;
+        }
 
-    nav a:hover {
-        background-color: #0056b3;
-    }
+        nav h1 {
+            font-size: 1.5em;
+            margin: 0;
+            color: white;
+        }
 
+        nav a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            margin: 0 10px;
+            border-radius: 14px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #91A7BF;
+            color:blue;
+        }
     .container {
         max-width: 600px;
         margin: 150px auto 30px; /* Center with auto margins and space below */
@@ -127,30 +142,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Hover color */
     }
 
-    footer {
-            background-color: #07257F; /* Match with the navbar color */
+     /* Sticky Footer */
+     footer {
+            background-color: #07257F;
             color: white;
             text-align: center;
             padding: 15px;
             font-size: 16px;
-            margin-top: auto; /* Ensures footer stays at the bottom */
+            margin-top: auto;
+            position: sticky; /* Change to sticky */
+            bottom: 0; /* Stick to the bottom */
+            left: 0;
             width: 100%;
-            position: relative;
         }
-
+        footer p{
+            color:white;
+        }
         footer a {
             color: white;
             text-decoration: none;
-            padding: 0 10px;
+            font-size:15px;
         }
 
-       
         footer a:hover {
-            color: #ffcc00; /* Highlight on hover */
-            text-decoration: underline; /* Underline on hover */
+            color: #ffcc00;
+            font-size:16px;
+            text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            nav img {
+                height: 40px; /* Adjust logo height for mobile */
+            }
+
+            nav a {
+                font-size: 18px; /* Adjust font size for links */
+            }
+
+            .container {
+                padding: 20px;
+            }
         }
 </style>
->
 </head>
 <body>
     <nav>
@@ -159,13 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h1>Event Management System</h1>
         </div>
         <div>
-        <a href="login.php" style="background: white; border: none; color: black; cursor: pointer; 
-            padding: 14px 20px;margin-right:30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 24px; font-size: 20px; transition: background-color 0.3s ease;"
-            onmouseover="this.style.backgroundColor='#7D7F86'; this.style.color = 'white';" 
-            onmouseout="this.style.backgroundColor='white'; this.style.color = 'black';">
-            Sign In
-        </a>
+        <a href="login.php">Sign In</a>
         </div>
     </nav>
     <div class="container">

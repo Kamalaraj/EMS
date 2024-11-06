@@ -57,64 +57,98 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reset'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Reset</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column; /* Stack elements vertically */
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(to right, #A1C4FD, #C2E9FB); /* Light background for better contrast */
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+            /* Body Styles */
+            body {
+                font-family: Arial, sans-serif;
+                background: linear-gradient(to right, #A1C4FD, #C2E9FB);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                color: #333;
+            }
+
+        /* Sticky Navbar */
         nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #07257F; /* Nav background color */
+            background-color: #07257F;
+            color: white;
             padding: 10px 20px;
-            width: 100%; /* Full width */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow */
+            z-index: 1000;
         }
 
         nav img {
-            height: 50px; /* Logo height */
-            width: auto; /* Maintain aspect ratio */
-            margin-right: 20px; /* Space between logo and links */
-            border-radius: 5px; /* Rounded corners for logo */
+            height: 50px;
+            border-radius: 10px;
         }
 
         nav h1 {
-            color: white; /* Title color */
-            margin: 0; /* Remove default margin */
-            font-size: 1.5em; /* Adjust size */
+            font-size: 24px;
+            margin-left: 10px;
         }
 
         nav a {
-            color: white; /* Link color */
-            text-decoration: none; /* Remove underline */
-            padding: 10px 15px; /* Padding for links */
-            border-radius: 5px; /* Rounded corners for links */
-            transition: background-color 0.3s ease; /* Smooth transition */
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            margin: 0 10px;
+            border-radius: 14px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
         }
 
         nav a:hover {
-            background-color: #0056b3; /* Hover effect */
+            background-color: #91A7BF;
+            text-decoration:none;
+            color:blue;
         }
 
         .reset-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 500px; /* Wider for better usability */
             background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 50px; /* Increased padding for spaciousness */
+            border-radius: 12px; /* Softer corners */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
             text-align: center;
-            margin-top: 20px; /* Add space above the container */
+            margin: 100px auto; /* Centering the container */
+            position: relative; /* Allow for decorative circles */
+            overflow: hidden;
+            font-size:18px; /* Ensures circles don't overflow */
         }
-        
+
+        /* Decorative Circles */
+        .reset-container::before, .reset-container::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: #A1C4FD;
+            opacity: 0.15; /* Lighter for subtlety */
+        }
+        .reset-container::before {
+            width: 150px; /* Slightly larger for better effect */
+            height: 150px;
+            top: -60px;
+            left: -60px;
+        }
+        .reset-container::after {
+            width: 100px;
+            height: 100px;
+            bottom: -50px;
+            right: -50px;
+        }
+
         h2 {
-            font-size: 1.8em;
+            font-size: 2em; /* Larger for emphasis */
             margin-bottom: 20px;
             color: #007bff;
         }
@@ -124,25 +158,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reset'])) {
             font-weight: bold;
             color: #555;
             display: block;
-            text-align: left; /* Align labels to the left */
+            text-align: left;
         }
 
         input[type="password"], input[type="text"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px; /* Increased padding for comfort */
             margin-bottom: 15px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 6px; /* Softer borders */
             font-size: 1em;
         }
 
         button[type="submit"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px; /* Increased padding */
             background-color: #007bff;
             color: #ffffff;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px; /* Softer corners */
             cursor: pointer;
             font-size: 1em;
             transition: background-color 0.3s ease;
@@ -155,28 +189,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reset'])) {
         p {
             font-size: 0.9em;
             color: #666;
-            margin-top: 15px; /* Add margin for better spacing */
+            margin-top: 15px;
         }
 
         footer {
-            background-color: #07257F; /* Match with the navbar color */
+            background-color: #07257F; 
             color: white;
             text-align: center;
             padding: 15px;
             font-size: 16px;
-            margin-top: auto; /* Footer sticks to the bottom */
-            width: 100%; /* Full width */
-            position: relative;
+            margin-top: auto; /* Ensure footer stays at bottom */
+            width: 100%;
+        }
+        footer p{
+            color:white;
         }
 
         footer a {
             color: white;
+            font-size:16px;
             text-decoration: none;
-            padding: 0 10px;
+            padding: 10px;
         }
 
         footer a:hover {
-            color: #ffcc00; /* Highlight on hover */
+            color: #ffcc00;
+            text-decoration: underline; 
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav h1 {
+                font-size: 1.5em;
+            }
+
+            .reset-container {
+                padding: 30px;
+                margin: 15px; /* Adjust for smaller screens */
+            }
+
+            footer {
+                font-size: 14px;
+            }
+
+            nav a {
+                font-size: 14px; /* Smaller for better fit */
+            }
         }
     </style>
 </head>
@@ -187,13 +245,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reset'])) {
             <h1>Event Management System</h1>
         </div>
         <div>
-        <a href="login.php" style="background: white; border: none; color: black; cursor: pointer; 
-            padding: 14px 20px;margin-right:30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 24px; font-size: 20px; transition: background-color 0.3s ease;"
-            onmouseover="this.style.backgroundColor='#7D7F86'; this.style.color = 'white';" 
-            onmouseout="this.style.backgroundColor='white'; this.style.color = 'black';">
-            Sign In
-        </a>
+        <a href="login.php">Sign In</a>
         </div>
     </nav>
     <div class="reset-container">

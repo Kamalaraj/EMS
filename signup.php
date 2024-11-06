@@ -86,7 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <style> /* General Reset */
+    <style>
+        /* General Reset */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         /* Body Styles */
@@ -96,155 +97,233 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items:center;
-            height:100vh;
+            align-items: center;
+            min-height: 100vh;
             color: #333;
         }
-        
+
+        /* Sticky Navbar */
         nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             display: flex;
             justify-content: space-between;
-            color:white;
             align-items: center;
-            background-color: #07257F; /* Semi-transparent blue */
+            background-color: #07257F;
+            color: white;
             padding: 10px 20px;
-            width: 100%; /* Make sure the nav takes full width */
+            z-index: 1000;
         }
 
         nav img {
-            height: 60px; /* Increase logo height */
-            width: auto; /* Maintain aspect ratio */
-            margin-right: 20px; /* Space between logo and links */
+            height: 50px;
             border-radius: 10px;
+        }
+
+        nav h1 {
+            font-size: 24px;
+            margin-left: 10px;
         }
 
         nav a {
             color: white;
-            padding: 10px 20px; /* Reduce padding for better alignment */
+            padding: 10px 20px;
             text-decoration: none;
             margin: 0 10px;
             border-radius: 14px;
-            font-size: 18px; /* Slightly smaller font size for better spacing */
+            font-size: 18px;
             transition: background-color 0.3s ease;
         }
 
         nav a:hover {
-            background-color: #0056b3;
+            background-color: #91A7BF;
+            text-decoration:none;
+            color:blue;
         }
 
+        .auth-container {
+            width: 90%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            line-height:1;
+            margin:100px auto;
+            font-size:20px;
+        }
+
+        /* Decorative Circles */
+        .auth-container::before, .auth-container::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: #A1C4FD;
+            opacity: 0.2;
+        }
+        .auth-container::before {
+            width: 120px;
+            height: 120px;
+            top: -40px;
+            left: -40px;
+        }
+        .auth-container::after {
+            width: 80px;
+            height: 80px;
+            bottom: -30px;
+            right: -30px;
+        }
+
+        /* Form Title */
+        h2 { 
+            font-size: 1.8em; 
+            margin-bottom: 20px; 
+            color: #007bff; 
+            position: relative;
+        }
+
+        /* Form Message */
+        p.message {
+            background: #ffdddd;
+            color: #b30000;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        /* Form Fields */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"],select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus , select:focus{
+            border-color: #007bff;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+        }
+
+        /* Button */
         button[type="submit"] {
-            background: none; 
-            border: none; 
-            color: black; 
-            cursor: pointer; 
-            padding: 10px 20px; /* Same padding as the other links */
-            text-decoration: none; 
-            margin: 0 10px; 
-            border-radius: 25px; 
-            font-size: 18px; /* Match the font size of the other links */
-            transition: background-color 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
         }
 
         button[type="submit"]:hover {
-            background-color: #dc3545; 
-            color: white;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            background-color: #0056b3;
+            transform: translateY(-2px);
         }
-
-        /* Container */
-        .auth-container {
-            width: 100%;
-            max-width: 600px;
-            background-color: #ffffff;
-            margin-top:20px;
-            margin-bottom:10px;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            line-height:1;
-        }
-
-        /* Form Titles */
-        h2 { font-size: 2em; margin-bottom: 20px; color: #007bff; }
-
-        /* Form Styles */
-        form { display: flex; flex-direction: column; align-items: flex-start; }
-
-        label { margin-bottom: 5px; font-weight: bold; color: #555; }
-
-        input[type="text"], input[type="password"], select {
-            width: 100%; padding: 10px; margin-bottom: 15px;
-            border: 1px solid #ccc; border-radius: 5px; font-size: 1em;
-        }
-
-        button[type="submit"] {
-            width: auto; /* Adjust width so buttons don't stretch */
-            padding: 10px 20px; /* Adjust padding for better spacing */
-            background-color: #007bff;
-            color: #ffffff;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-            display: inline-flex; /* This ensures buttons stay inline */
-            align-items: center; /* Vertically center text */
-            margin-right: 10px; /* Adds space between buttons */
-        }
-
-
-        button[type="submit"]:hover { background-color: #0056b3; }
 
         /* Link Styles */
-        p { font-size: 0.9em; color: #666; }
-        a { color: #007bff; text-decoration: none; }
-        a:hover { color: #0056b3; }
+        p, a {
+            font-size: 0.9em;
+            color: #666;
+            text-decoration: none;
+        }
 
-        /* Footer Styles */
+        a {
+            color: #007bff;
+        }
+
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Spacing for links */
+        .links {
+            margin-top: 20px;
+        }
+
+        /* Sticky Footer */
         footer {
-            background-color: #07257F; /* Match with the navbar color */
+            background-color: #07257F;
             color: white;
             text-align: center;
+            font-size:10px;
             padding: 15px;
             font-size: 16px;
-            margin-top: auto; /* Ensures footer stays at the bottom */
             width: 100%;
-            position: relative;
+            position: sticky;
+            bottom: 0;
+        }
+        footer p{
+            color:white;
         }
 
         footer a {
             color: white;
             text-decoration: none;
-            padding: 0 10px;
+            font-size:15px;
         }
 
-       
         footer a:hover {
-            color: #ffcc00; /* Highlight on hover */
-            text-decoration: underline; /* Underline on hover */
+            color: #ffcc00;
+            font-size:16px;
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav h1 {
+                font-size: 1.2em;
+            }
+
+            .auth-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            footer {
+                font-size: 14px;
+            }
         }
     </style>
-    <script src="scripts.js"></script> <!-- Assuming scripts.js contains your JS functions -->
+    <script src="scripts.js"></script>
 </head>
 <body>
+    <!-- Navbar -->
     <nav>
         <div style="display: flex; align-items: center;">
             <img src="image/logo.png" alt="Logo">
             <h1>Event Management System</h1>
         </div>
         <div>
-        <a href="login.php" style="background: white; border: none; color: black; cursor: pointer; 
-            padding: 14px 20px;margin-right:30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 24px; font-size: 20px; transition: background-color 0.3s ease;"
-            onmouseover="this.style.backgroundColor='#7D7F86'; this.style.color = 'white';" 
-            onmouseout="this.style.backgroundColor='white'; this.style.color = 'black';">
-            Sign In
-        </a>
+            <a href="login.php">Sign In</a>
         </div>
     </nav>
 
+    <!-- Signup Container -->
     <div class="auth-container">
         <h2>Sign Up</h2>
 
@@ -291,29 +370,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <label for="levelOfStudy">Level Of Study:</label>
                 <select name="levelOfStudy" id="levelOfStudy">
-                <option value="">Select here</option>
-                <option value="Level 1">Level 1</option>
-                <option value="Level 2">Level 2</option>
-                <option value="Level 3">Level 3</option>
-                <option value="Level 4">Level 4</option>
-            </select>
+                    <option value="">Select here</option>
+                    <option value="Level 1">Level 1</option>
+                    <option value="Level 2">Level 2</option>
+                    <option value="Level 3">Level 3</option>
+                    <option value="Level 4">Level 4</option>
+                </select>
             </div>
 
             <!-- Common Fields -->
             <label for="signupUsername">Username:</label>
             <input type="text" id="signupUsername" name="username" required>
+
             <label for="signupPassword">Password:</label>
             <input type="password" id="signupPassword" name="password" required>
+
             <label for="confirmPassword">Confirm Password:</label>
             <input type="password" id="confirmPassword" name="confirmPassword" required>
+
             <button type="submit">Sign Up</button>
         </form>
 
-        <p>
-            Already have an account? <a href="login.php">Sign In</a>
-        </p>
+        <p>Already have an account? <a href="login.php">Sign In</a></p>
     </div>
 
+    <!-- Footer -->
     <footer>
         <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="contactUS.php">Contact Us</a> | <a href="about.php">About Us</a></p>
     </footer>
@@ -321,13 +402,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         function toggleFormFields() {
             const userType = document.getElementById('signupUserType').value;
-            if (userType === 'organizer') {
-                document.getElementById('organizerFields').style.display = 'block';
-                document.getElementById('studentFields').style.display = 'none';
-            } else {
-                document.getElementById('organizerFields').style.display = 'none';
-                document.getElementById('studentFields').style.display = 'block';
-            }
+            document.getElementById('organizerFields').style.display = userType === 'organizer' ? 'block' : 'none';
+            document.getElementById('studentFields').style.display = userType === 'student' ? 'block' : 'none';
         }
     </script>
 </body>

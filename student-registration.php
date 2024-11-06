@@ -85,7 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Registration</title>
     <style>
-         * {
+        /* General Reset */
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -100,41 +101,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             display: flex;
             flex-direction: column;
             line-height: 1.5;
-            margin-top:80px;
         }
 
-        /* Navigation Bar */
+        /* Sticky Navbar */
         nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #07257F;
-            padding: 10px 30px;
-            position: absolute;
-            top: 0;
-            left: 0;
+            color: white;
+            padding: 5px 10px;
             width: 100%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         nav img {
             height: 60px;
+            width: auto;
+            margin-right: 20px;
             border-radius: 10px;
         }
 
+        nav h1 {
+            font-size: 1.5em;
+            margin: 0;
+            color: white;
+        }
+
         nav a {
-            color: black;
+            color: white;
             padding: 10px 20px;
             text-decoration: none;
             margin: 0 10px;
-            border-radius: 24px;
-            font-size: 20px;
+            border-radius: 14px;
+            font-size: 18px;
             transition: background-color 0.3s ease;
-            background-color: white;
         }
 
         nav a:hover {
-            background-color: #7D7F86;
+            background-color: #91A7BF;
+            color:blue;
         }
         .container {
             max-width: 600px;
@@ -142,6 +151,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             padding: 20px;
             background-color: white;
             border-radius: 8px;
+            position: relative;
+            font-size:18px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         h2 {
@@ -196,6 +207,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         #backButton:hover {
             background-color: #0056b3;
         }
+        /* Sticky Footer */
         footer {
             background-color: #07257F;
             color: white;
@@ -203,17 +215,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             padding: 15px;
             font-size: 16px;
             margin-top: auto;
+            position: sticky; /* Change to sticky */
+            bottom: 0; /* Stick to the bottom */
+            left: 0;
+            width: 100%;
         }
-
+        footer p{
+            color:white;
+        }
         footer a {
             color: white;
             text-decoration: none;
-            padding: 0 10px;
+            font-size:15px;
         }
 
         footer a:hover {
             color: #ffcc00;
+            font-size:16px;
             text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            nav img {
+                height: 40px; /* Adjust logo height for mobile */
+            }
+
+            nav a {
+                font-size: 18px; /* Adjust font size for links */
+            }
+
+            .container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -221,9 +260,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <nav>
         <div style="display: flex; align-items: center;">
             <img src="image/logo.png" alt="Logo"> <!-- Replace with your logo path -->
-            <a href="student-dashboard.php">Dashboard</a>
+            <h1>Event Management System</h1>
         </div>
         <div>
+            <a href="student-dashboard.php">Dashboard</a>
             <a href="student-about.php">About Us</a>
             <a href="student-contactUS.php">Contact Us</a>
             <a href="student-profile.php">Profile</a>

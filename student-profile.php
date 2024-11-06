@@ -80,58 +80,91 @@ $currentUser = $_SESSION['currentUser'];
 
         /* Body Styling */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #A1C4FD, #C2E9FB);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: Arial, sans-serif;
+            color: #333;
+            background: linear-gradient(to right, #A1C4FD, #C2E9FB); /* Gradient background */
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            align-items:center;
         }
 
-        /* Navigation Bar */
+        /* Sticky Navbar */
         nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #07257F;
-            padding: 10px 30px;
-            position: absolute;
-            top: 0;
-            left: 0;
+            color: white;
+            padding: 5px 10px;
             width: 100%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         nav img {
             height: 60px;
+            width: auto;
+            margin-right: 20px;
             border-radius: 10px;
         }
 
+        nav h1 {
+            font-size: 1.5em;
+            margin: 0;
+            color: white;
+        }
+
         nav a {
-            color: black;
-            background: white;
+            color: white;
             padding: 10px 20px;
             text-decoration: none;
             margin: 0 10px;
-            border-radius: 24px;
-            font-size: 20px;
+            border-radius: 14px;
+            font-size: 18px;
             transition: background-color 0.3s ease;
         }
 
         nav a:hover {
-            background-color: #7D7F86;
+            background-color: #91A7BF;
+            color:blue;
         }
 
         /* Container Styling */
         .profile-container {
-            width: 100%;
-            max-width: 600px;
+            width: 90%;
+            max-width: 800px;
             background-color: #ffffff;
             padding: 30px;
-            margin-top: 120px;
-            border-radius: 10px;
+            margin:30px auto;
+            border-radius: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
+            position: relative;
+            font-size:18px;
+        }
+        /* Decorative Circles */
+        .profile-container::before, .auth-container::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: #A1C4FD;
+            opacity: 0.2;
+        }
+        .auth-container::before {
+            width: 120px;
+            height: 120px;
+            top: -40px;
+            left: -40px;
+        }
+        .auth-container::after {
+            width: 80px;
+            height: 80px;
+            bottom: -30px;
+            right: -30px;
         }
 
         /* Header Styling */
@@ -209,92 +242,114 @@ $currentUser = $_SESSION['currentUser'];
             background-color: #b02a37;
         }
 
-        /* Footer */
+        /* Sticky Footer */
         footer {
             background-color: #07257F;
             color: white;
             text-align: center;
             padding: 15px;
             font-size: 16px;
-            position: absolute;
-            bottom: 0;
+            margin-top: auto;
+            position: sticky; /* Change to sticky */
+            bottom: 0; /* Stick to the bottom */
             left: 0;
             width: 100%;
         }
-
+        footer p{
+            color:white;
+        }
         footer a {
             color: white;
             text-decoration: none;
-            padding: 0 10px;
+            font-size:15px;
         }
 
         footer a:hover {
             color: #ffcc00;
+            font-size:16px;
             text-decoration: underline;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            nav img {
+                height: 40px; /* Adjust logo height for mobile */
+            }
+
+            nav a {
+                font-size: 18px; /* Adjust font size for links */
+            }
+
+            .profile-container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-<nav>
+    <nav>
         <div style="display: flex; align-items: center;">
             <img src="image/logo.png" alt="Logo"> <!-- Replace with your logo path -->
-            <a style="padding: 10px 20px;" href="student-dashboard.php">Dashboard</a>
+            <h1>Event Management System</h1>
         </div>
         <div>
+            <a href="student-dashboard.php">Dashboard</a>
             <a href="student-about.php">About Us</a>
             <a href="student-contactUS.php">Contact Us</a>
             <a href="student-profile.php">Profile</a>
-            <a href="login.php" style="background: white; border: none; color: black; cursor: pointer; padding: 10px 20px; margin-right: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 24px; font-size: 20px; transition: background-color 0.3s ease;"
-               onmouseover="this.style.backgroundColor='#7D7F86'; this.style.color = 'white';"
-               onmouseout="this.style.backgroundColor='white'; this.style.color='black';">Sign out</a>
+            <a href="login.php">Sign Out</a>
         </div>
     </nav>
     <div class="profile-container">
         <h2><u>Student Profile</u></h2>
         <div class="profile-info">
-        <?php if (!empty($currentUser['profileImage'])): ?>
-        <div class="profile-image-container" style="position: relative; display: inline-block;">
-        <img src="data:image/jpeg;base64,<?php echo base64_encode($currentUser['profileImage']); ?>" alt="Profile Image" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
-        <span class="edit-icon" onclick="toggleUploadForm()" style="position: absolute; bottom: 10px; right: 10px; cursor: pointer; background-color: #007bff; color: white; padding: 5px; border-radius: 50%;">
-            &#9998; <!-- This is a pencil/edit icon -->
-        </span>
-        </div>
-    <?php else: ?>
-    <div class="profile-image-container" style="position: relative; display: inline-block;">
-        <img src="default-profile.png" alt="Default Profile Image" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
-        <span class="edit-icon" onclick="toggleUploadForm()" style="position: absolute; bottom: 10px; right: 10px; cursor: pointer; background-color: #007bff; color: white; padding: 5px; border-radius: 50%;">
-            &#9998; <!-- This is a pencil/edit icon -->
-        </span>
-    </div>
-<?php endif; ?>
+            <?php if (!empty($currentUser['profileImage'])): ?>
+            <div class="profile-image-container" style="position: relative; display: inline-block;">
+                <img src="data:image/jpeg;base64,<?php echo base64_encode($currentUser['profileImage']); ?>" alt="Profile Image" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+                <span class="edit-icon" onclick="toggleUploadForm()" style="position: absolute; bottom: 10px; right: 10px; cursor: pointer; background-color: #007bff; color: white; padding: 5px; border-radius: 50%;">
+                &#9998; <!-- This is a pencil/edit icon -->
+                </span>
+            </div>
+            <?php else: ?>
+            <div class="profile-image-container" style="position: relative; display: inline-block;">
+                <img src="default-profile.png" alt="Default Profile Image" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+                <span class="edit-icon" onclick="toggleUploadForm()" style="position: absolute; bottom: 10px; right: 10px; cursor: pointer; background-color: #007bff; color: white; padding: 5px; border-radius: 50%;">
+                &#9998; <!-- This is a pencil/edit icon -->
+                </span>
+            </div>
+            <?php endif; ?>
 
-<!-- Form to upload profile image -->
-<div id="fileUploadContainer" class="file-upload-container" style="display: none; margin-top: 10px;">
-    <form action="organizer-profile.php" method="POST" enctype="multipart/form-data">
-        <input type="file" name="profileImage" accept="image/*" required>
-        <button type="submit" name="uploadImage">Upload Image</button>
-    </form>
-</div>
+            <!-- Form to upload profile image -->
+            <div id="fileUploadContainer" class="file-upload-container" style="display: none; margin-top: 10px;">
+                <form action="organizer-profile.php" method="POST" enctype="multipart/form-data">
+                <input type="file" name="profileImage" accept="image/*" required>
+                <button type="submit" name="uploadImage">Upload Image</button>
+                </form>
+            </div>
 
-        <script>
-            // Function to toggle the visibility of the file upload form
-            function toggleUploadForm() {
-                const uploadForm = document.getElementById('fileUploadContainer');
-                if (uploadForm.style.display === "none") {
-                    uploadForm.style.display = "block";
-                } else {
-                    uploadForm.style.display = "none";
+            <script>
+                // Function to toggle the visibility of the file upload form
+                function toggleUploadForm() {
+                    const uploadForm = document.getElementById('fileUploadContainer');
+                    if (uploadForm.style.display === "none") {
+                        uploadForm.style.display = "block";
+                    } else {
+                        uploadForm.style.display = "none";
+                    }
                 }
-            }
-        </script>
-        <p><strong>Student ID:</strong> <?php echo isset($currentUser['userID']) ? htmlspecialchars($currentUser['userID']) : 'Not Available'; ?></p><br>
-        <p><strong>First Name:</strong> <?php echo htmlspecialchars($currentUser['firstName']); ?></p><br>
-        <p><strong>Last Name:</strong> <?php echo htmlspecialchars($currentUser['LastName']); ?></p><br>
-        <p><strong>Registration Number:</strong> <?php echo htmlspecialchars($currentUser['Reg_No']); ?></p><br>
-        <p><strong>E-mail :</strong> <?php echo htmlspecialchars($currentUser['email']); ?></p><br>
-        <p><strong>Level Of Study :</strong> <?php echo htmlspecialchars($currentUser['yearOfStudy']); ?></p><br>
-        <p><strong>Username:</strong> <?php echo htmlspecialchars($currentUser['username']); ?></p><br>
-        <!-- Add other student-specific details here -->
+            </script>
+            <p><strong>First Name:</strong> <?php echo htmlspecialchars($currentUser['firstName']); ?></p><br>
+            <p><strong>Last Name:</strong> <?php echo htmlspecialchars($currentUser['LastName']); ?></p><br>
+            <p><strong>Registration Number:</strong> <?php echo htmlspecialchars($currentUser['Reg_No']); ?></p><br>
+            <p><strong>E-mail :</strong> <?php echo htmlspecialchars($currentUser['email']); ?></p><br>
+            <p><strong>Username:</strong> <?php echo htmlspecialchars($currentUser['username']); ?></p><br>
+            <!-- Add other student-specific details here -->
+        </div>
     </div>
     <footer>
         <p>&copy; <?php echo date("Y"); ?> Event Management System | <a href="student-contactUS.php">Contact Us</a> | <a href="student-about.php">About Us</a></p>
