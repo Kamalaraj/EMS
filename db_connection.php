@@ -1,18 +1,18 @@
 <?php
 // Database connection configuration
-/* $host = '10.10.10.157';            // Database host
+$host = '10.10.10.157';            // Database host
 $db = 'group9';                    // Replace with your EMS database name
 $user = 'csc210user';                 // Replace with your database username
 $pass = 'CSC210!';                     // Replace with your database password
-$charset = 'utf8mb4';           // Character set for database connection */
+$charset = 'utf8mb4';           // Character set for database connection
 
-// Database connection configuration
+/* // Database connection configuration
 $host = 'localhost';            // Database host
 $db = 'group9';                    // Replace with your EMS database name
 $user = 'root';                 // Replace with your database username
 $pass = '';                     // Replace with your database password
 $charset = 'utf8mb4';           // Character set for database connection
-
+ */
 // Data Source Name (DSN)
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 
