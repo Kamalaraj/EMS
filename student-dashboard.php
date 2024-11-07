@@ -414,6 +414,9 @@ foreach ($events as $event) {
                                 ?>
                             </p>
                         </div>
+                        <div>
+                        <a href="student-registration.php?eventId=<?php echo htmlspecialchars($event['eventID']); ?>">Register</a>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
