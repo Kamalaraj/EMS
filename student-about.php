@@ -158,7 +158,7 @@
         <div>
             <a href="student-dashboard.php">Dashboard</a>
             <a href="student-about.php">About Us</a>
-            <a href="student-contactUs.php">contact Us</a>
+            <a href="student-contactUs.php">Contact Us</a>
             <a href="student-profile.php">Profile</a>
             <a href="login.php">Sign Out</a>
         </div>
